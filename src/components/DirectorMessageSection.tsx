@@ -26,27 +26,36 @@ export default function DirectorMessageSection() {
                   <ImageWithFallback
                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"
                     alt="Campus Director"
-                    className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white shadow-lg"
+                    className="w-48 h-48 md:w-64 md:h-64 rounded-full object-cover border-4 border-white shadow-xl"
                   />
-                  <div className="absolute -bottom-2 -right-2 bg-blue-600 text-white p-2 rounded-full shadow-lg">
-                    <User className="w-4 h-4" />
+                  <div className="absolute -bottom-3 -right-3 bg-blue-600 text-white p-3 rounded-full shadow-lg">
+                    <User className="w-5 h-5" />
                   </div>
                 </div>
               </div>
 
               {/* Message Content */}
               <div className="flex-1 text-center md:text-left">
-                <blockquote className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6 italic">
-                  "Welcome to Sorsogon State University - Bulan Campus! As we continue our mission of 
-                  academic excellence and community service, I am proud to lead an institution that 
-                  fosters innovation, critical thinking, and character development. Our commitment to 
-                  providing quality education remains unwavering as we prepare our students to become 
-                  responsible leaders and productive citizens of tomorrow."
+                <blockquote className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6 italic max-w-4xl mx-auto">
+                  The Sorsogon State University (SorSU) Bulan Campus spans a total land area of 6.2 hectares, 
+                  housing a variety of buildings and laboratory spaces to support its eight academic programs. 
+                  These programs primarily focus on Information Technology, Public Administration, Entrepreneurship, 
+                  and Education. The campus is divided into two main colleges: the College of Information and 
+                  Communications Technology (ICT) and the College of Business Management and Education.
+                </blockquote>
+
+                <blockquote className="text-lg md:text-xl text-gray-700 leading-relaxed italic max-w-4xl mx-auto">
+                  SorSU Bulan Campus is committed to fostering an environment that equips both students and faculty with the skills 
+                  needed to meet the demands of globalization. In line with this, the campus has established strong international 
+                  collaborations with universities in Southeast Asia and the United States. These partnerships aim to develop 
+                  industry-ready professionals who are competitive on a global scale. Furthermore, the campus remains active in 
+                  its research and extension efforts, securing the university’s first international research grant in collaboration 
+                  with a partner agency in the U.S.
                 </blockquote>
                 
                 <div className="space-y-2">
                   <h3 className="text-xl font-semibold text-gray-900">
-                    Dr. Maria Elena Santos
+                    Prof. Ma. Elena C. Demdam
                   </h3>
                   <p className="text-blue-600 font-medium">
                     Campus Director
@@ -56,7 +65,7 @@ export default function DirectorMessageSection() {
                   </p>
                 </div>
 
-                {/* Achievements or Vision Points */}
+                {/* Achievements or Vision Points 
                 <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600 mb-1">15+</div>
@@ -70,7 +79,7 @@ export default function DirectorMessageSection() {
                     <div className="text-2xl font-bold text-purple-600 mb-1">50+</div>
                     <div className="text-sm text-gray-600">Faculty Members</div>
                   </div>
-                </div>
+                </div>*/}
               </div>
             </div>
           </CardContent>

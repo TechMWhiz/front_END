@@ -1,6 +1,7 @@
 import { useState } from "react";
 import UniversityHeader from "./components/UniversityHeader";
 import HeroSection from "./components/HeroSection";
+import DirectorMessageSection from "./components/DirectorMessageSection";
 import ProgramsSection from "./components/ProgramsSection";
 import CampusSection from "./components/CampusSection";
 import StudentClubsSection from "./components/StudentClubsSection";
@@ -75,6 +76,7 @@ export default function App() {
         ) : (
           <>
             <HeroSection />
+            <DirectorMessageSection />
             <ProgramsSection />
             <CampusSection />
             <StudentClubsSection />
