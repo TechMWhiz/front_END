@@ -16,6 +16,7 @@ import {
   ChevronRight,
   ExternalLink
 } from "lucide-react";
+import React from "react";
 
 interface Department {
   id: string;

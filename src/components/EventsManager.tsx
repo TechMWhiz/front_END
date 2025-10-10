@@ -319,6 +319,7 @@ export default function EventsManager() {
                   <input
                     type="checkbox"
                     id="registrationRequired"
+                    aria-label="registrationRequired"
                     checked={formData.registrationRequired}
                     onChange={(e) => setFormData({...formData, registrationRequired: e.target.checked})}
                     className="rounded"
@@ -329,6 +330,7 @@ export default function EventsManager() {
                   <input
                     type="checkbox"
                     id="isPublic"
+                    aria-label="isPublic"
                     checked={formData.isPublic}
                     onChange={(e) => setFormData({...formData, isPublic: e.target.checked})}
                     className="rounded"

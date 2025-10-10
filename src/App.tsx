@@ -15,6 +15,7 @@ import FacultyDashboard from "./components/FacultyDashboard";
 import UnifiedLogin from "./components/UnifiedLogin";
 import FAQChatbot from "./components/FAQChatbot";
 import { Toaster } from "./components/ui/sonner";
+import React from "react";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

@@ -361,6 +361,7 @@ export default function FacultyDashboard() {
                   <div className="space-y-2">
                     <Label htmlFor="faq-category">Category</Label>
                     <select
+                      aria-label="faq-category"
                       id="faq-category"
                       className="w-full h-10 px-3 border border-input bg-background rounded-md"
                       value={newFAQ.category}
@@ -490,8 +491,9 @@ function EditFAQForm({
           />
         </div>
         <div className="space-y-2">
-          <Label>Category</Label>
+          <Label  htmlFor="category">Category</Label>
           <select
+            aria-label="category"
             className="w-full h-10 px-3 border border-input bg-background rounded-md"
             value={editedItem.category}
             onChange={(e) => setEditedItem(prev => ({ ...prev, category: e.target.value }))}

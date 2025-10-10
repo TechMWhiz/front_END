@@ -359,6 +359,7 @@ export default function CalendarManager() {
               <div>
                 <div className="flex items-center space-x-2 mb-3">
                   <input
+                    aria-label="isRecurring"
                     type="checkbox"
                     id="isRecurring"
                     checked={formData.isRecurring}
@@ -387,6 +388,7 @@ export default function CalendarManager() {
                   {groups.map(group => (
                     <div key={group} className="flex items-center space-x-2">
                       <input
+                        aria-label="group"
                         type="checkbox"
                         id={group}
                         checked={formData.affectedGroups.includes(group)}
@@ -503,7 +505,7 @@ export default function CalendarManager() {
                   <p className="text-xs text-muted-foreground mb-2">
                     {new Date(item.startDate).toLocaleDateString()}
                   </p>
-                  <Badge className={getPriorityColor(item.priority)} size="sm">
+                  <Badge className={getPriorityColor(item.priority)}>
                     {item.priority}
                   </Badge>
                 </div>
