@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "./ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Eye, EyeOff, Lock, User, Shield, GraduationCap, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import Logo from "../assets/sorsulogo.png";
 
 interface UnifiedLoginProps {
   onLogin: (success: boolean, userType: 'admin' | 'faculty', userData?: any) => void;
@@ -148,8 +149,8 @@ export default function UnifiedLogin({ onLogin, onBack }: UnifiedLoginProps) {
 
         <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader className="text-center pb-6">
-            <div className={`mx-auto w-16 h-16 bg-gradient-to-br ${getUserTypeGradient()} rounded-full flex items-center justify-center mb-4`}>
-              {getUserTypeIcon()}
+            <div className="mx-auto w-16 h-16 rounded-full overflow-hidden mb-4">
+              <img src={Logo} alt="SorSU Logo" className="w-full h-full object-contain" />
             </div>
             <CardTitle className="text-2xl">
               {formData.userType === 'admin' ? 'Admin Login' : 

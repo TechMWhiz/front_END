@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { GraduationCap, MapPin, Users, Award, Settings, LogIn, LogOut, Shield, Menu } from "lucide-react";
+import { GraduationCap, MapPin, Users, Award, Settings, LogIn, LogOut, Shield, Menu, X } from "lucide-react";
 import Logo from "../assets/sorsulogo.png"; // Add this import
 
 
@@ -19,7 +19,7 @@ export default function UniversityHeader({
   userType,
   userName
 }: UniversityHeaderProps) {
-  const [menuOpen, setMenuOpen] = useState(false); // 👈 Step 1
+  const [menuOpen, setMenuOpen] = useState(false); //Step 1
 
   return (
     <header className="border-b bg-white">
@@ -34,7 +34,7 @@ export default function UniversityHeader({
               <p className="text-sm text-muted-foreground">Sorsogon State University - Bulan Campus</p>
             </div>
           </div>
-          
+
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-4">
             {!isLoggedIn && (
@@ -83,10 +83,20 @@ export default function UniversityHeader({
             </div>
           </nav>
 
-
+            {/* Mobile Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="block md:hidden p-2 rounded-full hover:bg-black transition focus:outline-none"
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          
           {/* Mobile Nav */}
           {menuOpen && (
-          <div className="md:hidden mt-3 flex flex-col gap-2 text-sm">
+          <div className="fixed top-0 right-0 h-full w-64 bg-white z-50 shadow-lg px-6 py-8 transition-all duration-300 md:hidden">
+            <nav className="flex flex-col gap-6 text-sm">
             {!isLoggedIn && (
               <>
                 <a href="#programs" className="hover:text-primary">Programs</a>
@@ -102,7 +112,7 @@ export default function UniversityHeader({
               variant={isLoggedIn ? "default" : "outline"}
               size="sm"
               onClick={onLoginToggle}
-              className="flex items-center gap-2 mt-2"
+              className="flex items-center gap-2 mt-4"
             >
               {isLoggedIn ? (
                 <>
@@ -116,6 +126,7 @@ export default function UniversityHeader({
                 </>
               )}
             </Button>
+            </nav>
           </div>
         )}
           

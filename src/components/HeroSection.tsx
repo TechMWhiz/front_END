@@ -61,7 +61,7 @@ export default function HeroSection() {
               <ImageWithFallback 
               src={CampusImg}
               alt="University Campus Buildings"
-              className="w-full h-96 object-cover"
+              className="w-full max-w-xs md:max-w-md lg:max-w-lg object-cover rounded-lg shadow"
               />
             </Card>
           </div>
