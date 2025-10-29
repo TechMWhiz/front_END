@@ -95,8 +95,16 @@ export default function UniversityHeader({
           
           {/* Mobile Nav */}
           {menuOpen && (
-          <div className="fixed top-0 right-0 h-full w-64 bg-white z-50 shadow-lg px-6 py-8 transition-all duration-300 md:hidden">
-            <nav className="flex flex-col gap-6 text-sm">
+          <div className="fixed top-0 right-0 h-fit w-64 bg-white z-50 shadow-lg px-4 py-6 transition-all duration-300 md:hidden">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              className="absolute top-4 right-4 p-5 rounded-full hover:bg-gray-200 transition focus:outline-none"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <nav className="flex flex-col gap-4 text-sm mt-6">
             {!isLoggedIn && (
               <>
                 <a href="#programs" className="hover:text-primary">Programs</a>

@@ -1,7 +1,7 @@
-@custom-variant dark (&:is(.dark *));
+/* Removed invalid @custom-variant rule */
 
 :root {
-  --sorsu-red: #B22222;
+  --sorsu-red: #ff0000;
 
   --font-size: 16px;
   --background: #ffffff;

@@ -2,9 +2,18 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Briefcase, Laptop, FlaskConical, Brush, Calculator, Heart, Scale, Building2, BookOpen, Users } from "lucide-react";
+import { Briefcase, Laptop, FlaskConical, Brush, Calculator, Heart, Scale, Building2, BookOpen, Users, Icon } from "lucide-react";
 
 const programs = [
+  {
+    title: "Bachelor of Science in Computer Science",
+    icon: FlaskConical,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "The program includes the study of computing concepts and theories, algorithmic foundations and new developments in computing. It",
+    careers: ["Mobile App Developer", "Cybersecurity Specialist", "Web Developer"],
+    color: "green"
+  },
   {
     title: "Bachelor of Science in Information Technology",
     icon: Laptop,
@@ -15,49 +24,58 @@ const programs = [
     color: "blue"
   },
   {
-    title: "Bachelor of Science in Business Administration",
-    icon: Briefcase,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Business education focusing on management, entrepreneurship, and organizational leadership.",
-    careers: ["Business Manager", "Entrepreneur", "Operations Manager"],
-    color: "purple"
-  },
-  {
-    title: "Bachelor of Elementary Education",
+    title: "Bachelor of Science Information Systems",
     icon: BookOpen,
     duration: "4 years",
     type: "Bachelor's",
-    description: "Teacher education program preparing future elementary school educators.",
-    careers: ["Elementary Teacher", "Curriculum Developer", "Educational Coordinator"],
-    color: "green"
-  },
-  {
-    title: "Bachelor of Science in Agriculture",
-    icon: FlaskConical,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Agricultural science program focusing on crop production, soil management, and sustainable farming.",
-    careers: ["Agricultural Technician", "Farm Manager", "Agricultural Inspector"],
-    color: "orange"
-  },
-  {
-    title: "Bachelor of Science in Criminology",
-    icon: Scale,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Criminal justice program covering law enforcement, investigation, and public safety.",
-    careers: ["Police Officer", "Criminal Investigator", "Security Manager"],
+    description: "The program includes the study of application and effect of information technology to organizations.",
+    careers: ["Business Analyst", "Systems Analyst", "IT Project Manager"],
     color: "teal"
   },
   {
-    title: "Bachelor of Arts in English",
-    icon: BookOpen,
+    title: "Bachelor of Science in Accountancy",
+    icon: Calculator,
     duration: "4 years",
     type: "Bachelor's",
-    description: "Literature and language program developing communication and analytical skills.",
-    careers: ["English Teacher", "Content Writer", "Communications Specialist"],
+    description: "Accounting program focusing on financial reporting, auditing, and taxation.",
+    careers: ["Certified Public Accountant", "Auditor", "Financial Analyst"],
+    color: "purple"
+  },
+  {
+    title: "Bachelor of Science in Accounting Information System",
+    icon: Calculator,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "This program combines accounting principles with information systems to prepare students for careers in accounting technology.",
+    careers: ["Accounting Systems Analyst", "Financial Systems Manager", "IT Auditor"],
     color: "pink"
+  },
+  {
+    title: "Bachelor in Public Administration",
+    icon: Building2,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "This program prepares students for careers in public service and administration, focusing on governance, policy analysis, and public management.",
+    careers: ["Public Administrator", "Policy Analyst", "City Manager"],
+    color: "orange"
+  },
+  {
+    title: "Bachelor of Science in Entrepreneurship",
+    icon: Users,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "Entrepreneurship program focusing on business creation, innovation, and management.",
+    careers: ["Startup Founder", "Business Consultant", "Venture Capitalist"],
+    color: "green"
+  },
+  {
+    title: "Bachelor of Technical Vocational Teacher Education (BTVTED) major in Computer System Servicing",
+    icon: Briefcase,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "This is the newest program in Bulan Campus to be offered in AY 2023-2024. This program is designed to prepare students to become competent technical vocational teachers in the field of computer system servicing.",
+    careers: ["Technical Vocational Teacher", "IT Trainer", "Computer Technician"],
+    color: "blue"
   }
 ];
 
