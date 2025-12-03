@@ -2,6 +2,7 @@ import * as React from "react";
 import { GraduationCap, MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import Logo from "../assets/sorsulogo.png";
 
 export default function Footer() {
   return (
@@ -12,9 +13,9 @@ export default function Footer() {
           {/* University Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-white text-slate-900 rounded-lg">
-                <GraduationCap className="w-5 h-5" />
-              </div>
+            <div className="flex items-center justify-center w-10 h-10 bg-primary text-primary-foreground rounded-full">
+               <img src={Logo} alt="SorSU Logo" className="w-10 h-10 object-contain" />
+             </div>
               <div>
                 <h3 className="font-bold">SorSU-Bulan</h3>
                 <p className="text-sm text-slate-400">Sorsogon State University</p>

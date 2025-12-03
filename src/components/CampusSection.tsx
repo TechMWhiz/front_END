@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -5,11 +6,12 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { MapPin, Clock, Users, Wifi, Map } from "lucide-react";
 import { useState } from "react";
 import VirtualCampusMap from "./VirtualCampusMap";
+import libraryPhoto from  "../assets/lib.jpg";
 
 const facilities = [
   {
     name: "SorSU-Bulan Library",
-    image: "https://images.unsplash.com/photo-1595315342809-fa10945ed07c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaWJyYXJ5JTIwc3R1ZHklMjBzdHVkZW50c3xlbnwxfHx8fDE3NTc2NzU4OTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: libraryPhoto, 
     description: "Modern library facility with extensive collection of books, journals, and digital resources",
     features: ["Study Areas", "Computer Labs", "Internet Access", "Research Support"],
     hours: "Mon-Fri 7AM-8PM"

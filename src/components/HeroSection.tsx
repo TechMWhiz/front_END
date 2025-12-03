@@ -29,7 +29,7 @@ export default function HeroSection() {
                 <div className="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-lg mx-auto mb-2">
                   <BookOpen className="w-6 h-6" />
                 </div>
-                <p className="font-semibold">25+</p>
+                <p className="font-semibold">7+</p>
                 <p className="text-sm text-muted-foreground">Programs</p>
               </div>
               <div className="text-center">

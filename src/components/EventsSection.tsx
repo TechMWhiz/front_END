@@ -81,24 +81,6 @@ const mockEvents: Event[] = [
     featured: true
   },
   {
-    id: "3",
-    title: "Career Fair 2024",
-    description: "Meet with potential employers and explore career opportunities. Leading companies from various industries will be present to discuss job openings, internships, and career paths.",
-    type: "Career",
-    category: "Fair",
-    startDate: "2024-03-05",
-    startTime: "09:00",
-    endTime: "16:00",
-    location: "University Gymnasium",
-    organizer: "Career Services Office",
-    capacity: 500,
-    registrationRequired: true,
-    registrationDeadline: "2024-03-01",
-    contactEmail: "careers@sorsu-bulan.edu.ph",
-    tags: ["Career", "Jobs", "Networking", "Recruitment"],
-    featured: true
-  },
-  {
     id: "4",
     title: "Cultural Night: Celebrating Filipino Heritage",
     description: "An evening of Filipino culture featuring traditional dances, music performances, local cuisine, and art exhibitions. Showcase the rich cultural heritage of the Philippines.",

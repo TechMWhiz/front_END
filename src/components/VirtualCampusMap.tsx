@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import libraryPhoto from  "../assets/lib.jpg";
+import campusMap from "../assets/cmap.jpg";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { 
   MapPin, 
@@ -58,7 +60,7 @@ const CAMPUS_LOCATIONS: MapLocation[] = [
     position: { x: 60, y: 45 },
     icon: <BookOpen className="w-4 h-4" />,
     description: 'Modern library with digital resources, study areas, and research facilities.',
-    image: 'https://images.unsplash.com/photo-1684403798139-289e0f7fa5da?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1bml2ZXJzaXR5JTIwbGlicmFyeSUyMG1vZGVybnxlbnwxfHx8fDE3NTkzOTYxODN8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+    image: libraryPhoto, 
     details: {
       hours: '7:00 AM - 8:00 PM',
       capacity: '500 simultaneous users',
@@ -146,18 +148,6 @@ const CAMPUS_LOCATIONS: MapLocation[] = [
     }
   },
   {
-    id: 'garden',
-    name: 'Botanical Garden',
-    type: 'recreation',
-    position: { x: 80, y: 30 },
-    icon: <TreePine className="w-4 h-4" />,
-    description: 'Peaceful garden area for relaxation and outdoor activities.',
-    details: {
-      hours: '6:00 AM - 6:00 PM',
-      services: ['Walking Paths', 'Sitting Areas', 'Native Plants', 'Study Spots']
-    }
-  },
-  {
     id: 'auditorium',
     name: 'University Auditorium',
     type: 'facilities',
@@ -238,24 +228,13 @@ export default function VirtualCampusMap() {
         </CardHeader>
         <CardContent>
           <div className="relative w-full h-96 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute inset-0">
-              {/* Pathways */}
-              <svg className="absolute inset-0 w-full h-full">
-                <path 
-                  d="M 50 100 Q 200 200 400 100 T 700 150" 
-                  stroke="#94a3b8" 
-                  strokeWidth="8" 
-                  fill="none" 
-                  strokeDasharray="20,10"
-                />
-                <path 
-                  d="M 100 50 L 600 50 L 600 300 L 100 300 Z" 
-                  stroke="#94a3b8" 
-                  strokeWidth="4" 
-                  fill="none" 
-                />
-              </svg>
+          <div className="relative w-full h-96 rounded-lg overflow-hidden">
+            <img 
+            src={campusMap} 
+            alt="SorSU-Bulan Campus Map" 
+            className="w-full h-full object-contain"
+            />
+
               
               {/* Campus boundaries */}
               <div className="absolute inset-4 border-2 border-dashed border-gray-400 rounded-lg opacity-30"></div>

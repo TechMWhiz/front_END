@@ -9,13 +9,13 @@ import DepartmentsSection from "./components/DepartmentsSection";
 import FacultySection from "./components/FacultySection";
 import AnnouncementsSection from "./components/AnnouncementsSection";
 import EventsSection from "./components/EventsSection";
-import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
 import AdminDashboard from "./components/AdminDashboard";
 import FacultyDashboard from "./components/FacultyDashboard";
 import UnifiedLogin from "./components/UnifiedLogin";
 import FAQChatbot from "./components/FAQChatbot";
 import { Toaster } from "./components/ui/sonner";
+import ScrollToTop from "./components/ScrollToTop";
 import React from "react";
 
 export default function App() {
@@ -84,13 +84,13 @@ export default function App() {
             <FacultySection />
             <AnnouncementsSection />
             <EventsSection />
-            <FAQSection />
           </>
         )}
       </main>
       {!isLoggedIn && <Footer />}
       {!isLoggedIn && <FAQChatbot />}
       <Toaster />
+      <ScrollToTop />
     </div>
   );
 }

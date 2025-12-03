@@ -2,6 +2,7 @@ import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "./ui/dialog"; 
 import { Briefcase, Laptop, FlaskConical, Brush, Calculator, Heart, Scale, Building2, BookOpen, Users, Icon } from "lucide-react";
 
 const programs = [
@@ -89,6 +90,7 @@ const colorVariants: Record<string, string> = {
 };
 
 export default function ProgramsSection() {
+  const [selectedProgram, setSelectedProgram] = React.useState(null);
   return (
     <section id="programs" className="py-16 bg-white">
       <div className="container mx-auto px-4">
@@ -130,18 +132,49 @@ export default function ProgramsSection() {
                     </div>
                   </div>
                   
-                  <Button variant="outline" className="w-full">
-                    Learn More
-                  </Button>
+                  {/* Modal Trigger */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        Learn More
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colorVariants[program.color]}`}>
+                            <IconComponent className="w-5 h-5" />
+                          </div>
+                          {program.title}
+                        </DialogTitle>
+                      </DialogHeader>
+
+                      <p className="text-muted-foreground">{program.description}</p>
+
+                      <div className="mt-4">
+                        <h4 className="font-semibold mb-2">Career Opportunities</h4>
+                        <ul className="list-disc pl-5 text-sm space-y-1">
+                          {program.careers.map((career, idx) => (
+                            <li key={idx}>{career}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="mt-4 text-sm text-muted-foreground">
+                        <strong>Duration:</strong> {program.duration} <br />
+                        <strong>Type:</strong> {program.type}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             );
           })}
         </div>
         
-        <div className="text-center mt-12">
+        {/* <div className="text-center mt-12">
           <Button size="lg">View All Programs</Button>
-        </div>
+        </div> */}
       </div>
     </section>
   );

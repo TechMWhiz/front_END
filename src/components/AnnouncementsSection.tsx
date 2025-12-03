@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -58,19 +58,6 @@ const mockAnnouncements: Announcement[] = [
     author: "College of Engineering and Technology",
     isPinned: false,
     tags: ["Research", "Symposium", "Innovation"]
-  },
-  {
-    id: "3",
-    title: "Library Operating Hours During Midterm Period",
-    content: "The University Library will extend its operating hours during the midterm examination period. The library will be open from 7:00 AM to 10:00 PM on weekdays and 8:00 AM to 8:00 PM on weekends.",
-    type: "General",
-    priority: "Medium", 
-    targetAudience: "All Students",
-    publishDate: "2024-01-12",
-    expiryDate: "2024-02-28",
-    author: "University Library",
-    isPinned: false,
-    tags: ["Library", "Schedule", "Midterms"]
   },
   {
     id: "4",
