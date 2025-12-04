@@ -227,12 +227,12 @@ export default function VirtualCampusMap() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="relative w-full h-96 bg-gradient-to-br from-green-100 to-blue-100 rounded-lg overflow-hidden">
+          <div className="relative w-full aspect-video bg-gradient-to-br from-green-100 to-blue-100 rounded-lg overflow-hidden">
           <div className="relative w-full h-96 rounded-lg overflow-hidden">
             <img 
             src={campusMap} 
             alt="SorSU-Bulan Campus Map" 
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
             />
 
               

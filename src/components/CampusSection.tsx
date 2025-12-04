@@ -7,6 +7,7 @@ import { MapPin, Clock, Users, Wifi, Map } from "lucide-react";
 import { useState } from "react";
 import VirtualCampusMap from "./VirtualCampusMap";
 import libraryPhoto from  "../assets/lib.jpg";
+import labPhoto from "../assets/lab.jpg";
 
 const facilities = [
   {
@@ -18,7 +19,7 @@ const facilities = [
   },
   {
     name: "IT & Computer Laboratories",
-    image: "https://images.unsplash.com/photo-1582273953509-3972288b909e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbGFib3JhdG9yeSUyMGVxdWlwbWVudHxlbnwxfHx8fDE3NTc3MjQxMjZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image: labPhoto,
     description: "Well-equipped computer laboratories supporting IT and programming courses",
     features: ["Modern Computers", "Software Development Tools", "Network Labs", "Multimedia Systems"],
     hours: "Mon-Fri 7AM-7PM"
@@ -33,7 +34,7 @@ const facilities = [
 ];
 
 const campusStats = [
-  { label: "Campus Size", value: "8 hectares", icon: MapPin },
+  { label: "Campus Size", value: "6.2 hectares", icon: MapPin },
   { label: "Buildings", value: "12+", icon: Users },
   { label: "Classrooms", value: "45+", icon: Clock },
   { label: "WiFi Coverage", value: "Campus-wide", icon: Wifi }
