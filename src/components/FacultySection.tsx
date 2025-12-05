@@ -1,3 +1,4 @@
+// import { useEffect } from "react";
 import * as React from "react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -37,6 +38,7 @@ interface Faculty {
 }
 
 // Mock faculty data that would normally come from the admin-created faculty records
+// const [faculty, setFaculty] = useState<Faculty[]>([]);
 const mockFaculty: Faculty[] = [
   {
     id: "1",
@@ -183,6 +185,16 @@ export default function FacultySection() {
   const [filterDepartment, setFilterDepartment] = useState("All Departments");
   const [filterPosition, setFilterPosition] = useState("All Positions");
   const [expandedFaculty, setExpandedFaculty] = useState<string[]>([]);
+  // const [faculty, setFaculty] = useState<Faculty[]>([]);
+
+  // Fetch faculty data from backend
+  // uncomment na lng kapag meron nang backend
+  {/*useEffect(() => {
+    fetch("/api/faculty") // replace with your backend route
+      .then((res) => res.json())
+      .then((data) => setFaculty(data))
+      .catch((err) => console.error("Error fetching faculty:", err));
+  }, []);*/}
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -217,6 +229,7 @@ export default function FacultySection() {
     );
   };
 
+  // const filteredFaculty = faculty
   const filteredFaculty = mockFaculty
     .filter(faculty => {
       const matchesSearch = faculty.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
