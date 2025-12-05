@@ -44,49 +44,46 @@ interface Department {
 const mockDepartments: Department[] = [
   {
     id: "1",
-    name: "College of Engineering and Technology",
-    shortName: "CET",
-    description: "The College of Engineering and Technology is committed to producing competent and globally competitive engineers and technologists. We offer comprehensive programs in various engineering disciplines with state-of-the-art facilities and experienced faculty.",
+    name: "College of Information and Communications Technology",
+    shortName: "CICT",
+    description: "The College of Information and Communications Technology is dedicated to producing innovative, skilled, and globally competitive IT professionals. We offer comprehensive programs in computing, software development, and digital technologies, supported by modern facilities and expert faculty.",
     dean: "Dr. Maria Elena Santos",
     establishedYear: 1995,
-    location: "Engineering Building, SorSU-Bulan Campus",
-    email: "cet@sorsu-bulan.edu.ph",
+    location: "CCB BUilding, SorSU-Bulan Campus",
+    email: "cict@sorsu-bulan.edu.ph",
     phone: "+63 56 311 1234",
-    website: "https://sorsu-bulan.edu.ph/cet",
+    website: "https://sorsu-bulan.edu.ph/cict",
     programs: [
-      "Bachelor of Science in Civil Engineering",
-      "Bachelor of Science in Computer Engineering", 
-      "Bachelor of Science in Electrical Engineering",
-      "Bachelor of Science in Electronics Engineering",
       "Bachelor of Science in Information Technology",
-      "Bachelor of Science in Computer Science"
+      "Bachelor of Science in Computer Science",
+      "Bachelor of Science in Information Systems",
+      "Bachelor of Technical Vocational Teacher Education major in Computer System Servicing"
     ],
     facultyCount: 28,
     studentCount: 850,
-    accreditation: ["AACCUP Level II", "PRC Accredited", "CHED Center of Excellence"],
+    accreditation: ["AACCUP Level II"],
     researchAreas: [
-      "Sustainable Engineering",
-      "Artificial Intelligence",
-      "Renewable Energy Systems",
-      "Smart Infrastructure",
-      "Software Development"
+      "Artificial Intelligence & Machine Learning",
+      "Web and Mobile Application Development",
+      "Cybersecurity and Data Privacy",
+      "Cloud Computing & IoT",
+      "Software Engineering"
     ],
     facilities: [
-      "Computer Laboratories (5 units)",
-      "Electronics Laboratory",
-      "Physics Laboratory",
-      "Engineering Drawing Room",
-      "Fabrication Workshop",
-      "Testing Laboratory"
+      "Computer Laboratories (6 units)",
+      "Networking & Cybersecurity Laboratory",
+      "Multimedia & Graphics Lab",
+      "Innovation Hub / Startup Incubator",
+      "Smart Classroom"
     ],
     achievements: [
-      "Best Engineering School in Bicol Region 2023",
-      "Outstanding Graduate Performance in Board Exams",
-      "Research Excellence Award 2022",
-      "Industry Partnership Excellence 2021"
+      "Champion, Regional Hackathon 2024",
+      "Best IT School in Bicol Region 2023",
+      "Research Excellence Award in AI 2022",
+      "AACCUP Level II Accreditation"
     ],
-    mission: "To provide quality engineering and technology education that produces competent, innovative, and socially responsible professionals who contribute to national development.",
-    vision: "To be a premier college of engineering and technology in the Philippines, recognized for academic excellence, research innovation, and community engagement."
+      mission: "To provide quality ICT education that develops competent, innovative, and socially responsible professionals who advance digital transformation and national development.",
+  vision: "To be a premier College of Information and Communications Technology in the Philippines, recognized for excellence in teaching, research, and industry collaboration."
   },
   {
     id: "2",
