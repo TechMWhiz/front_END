@@ -22,10 +22,10 @@ export default function ScrollToTop() {
     style={{
       position: "fixed",
       bottom: "90px", // lifted above FAQ icon
-      right: "24px",
+      right: "35px",
       padding: "8px 12px",
-      backgroundColor: "#000", // solid black for contrast
-      color: "#fff",           // white text
+      backgroundColor: "#808080",
+      color: "#fff",
       border: "none",
       borderRadius: "4px",
       fontSize: "14px",
@@ -34,7 +34,7 @@ export default function ScrollToTop() {
       zIndex: 1000,
     }}
   >
-    Top
+    ↑
     </button>
   ) : null;
 }

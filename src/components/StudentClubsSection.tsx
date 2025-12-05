@@ -306,7 +306,7 @@ export default function StudentClubsSection() {
   const categories = Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>;
 
   return (
-    <section className="py-16 bg-gradient-to-br from-blue-50 to-green-50">
+    <section id="student-clubs" className="py-16 bg-gradient-to-br from-blue-50 to-green-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Student Clubs & Organizations</h2>
