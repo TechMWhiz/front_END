@@ -1,6 +1,8 @@
 /* Removed invalid @custom-variant rule */
 
 :root {
+  --sorsu-maroon: #800000;   /* SorSU Maroon */
+  --sorsu-gold: #FFD700;     /* SorSU Gold */
   --sorsu-red: #ff0000;
 
   --font-size: 16px;
@@ -81,6 +83,9 @@
 }
 
 @theme inline {
+  --sorsu-maroon: #800000;   /* SorSU Maroon */
+  --sorsu-gold: #FFD700;     /* SorSU Gold */
+  
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

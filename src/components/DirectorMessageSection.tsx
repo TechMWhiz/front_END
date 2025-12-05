@@ -2,6 +2,7 @@ import * as React from "react";
 import { MessageSquare, User } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import campusD from "../assets/campusD.png"; 
 
 export default function DirectorMessageSection() {
   return (
@@ -22,15 +23,27 @@ export default function DirectorMessageSection() {
             <div className="flex flex-col md:flex-row gap-8 items-start">
               {/* Director Photo */}
               <div className="flex-shrink-0 mx-auto md:mx-0">
-                <div className="relative">
+                <div className="relative mb-4">
                   <ImageWithFallback
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face"
+                    src={campusD}
                     alt="Campus Director"
-                    className="w-48 h-48 md:w-64 md:h-64 rounded-full object-cover border-4 border-white shadow-xl"
+                    className="w-48 h-48 md:w-64 md:h-64 rounded-full object-cover shadow-xl"
                   />
                   <div className="absolute -bottom-3 -right-3 bg-blue-600 text-white p-3 rounded-full shadow-lg">
                     <User className="w-5 h-5" />
                   </div>
+                </div>
+
+                <div className=" text-center">
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Prof. Ma. Elena C. Demdam
+                  </h3>
+                  <p className="text-red-600 font-medium">
+                    Campus Director
+                  </p>
+                  <p className="text-gray-600">
+                    Sorsogon State University - Bulan Campus
+                  </p>
                 </div>
               </div>
 
@@ -52,34 +65,6 @@ export default function DirectorMessageSection() {
                   its research and extension efforts, securing the university’s first international research grant in collaboration 
                   with a partner agency in the U.S.
                 </blockquote>
-                
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Prof. Ma. Elena C. Demdam
-                  </h3>
-                  <p className="text-blue-600 font-medium">
-                    Campus Director
-                  </p>
-                  <p className="text-gray-600">
-                    Sorsogon State University - Bulan Campus
-                  </p>
-                </div>
-
-                {/* Achievements or Vision Points 
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600 mb-1">15+</div>
-                    <div className="text-sm text-gray-600">Years of Leadership</div>
-                  </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600 mb-1">5K+</div>
-                    <div className="text-sm text-gray-600">Students Served</div>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600 mb-1">50+</div>
-                    <div className="text-sm text-gray-600">Faculty Members</div>
-                  </div>
-                </div>*/}
               </div>
             </div>
           </CardContent>
