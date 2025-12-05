@@ -33,7 +33,7 @@ import { Input } from "./ui/input";
 interface Club {
   id: string;
   name: string;
-  category: 'academic' | 'cultural' | 'sports' | 'service' | 'professional' | 'faith' | 'leadership' | 'leadership';
+  category: 'academic' | 'cultural' | 'sports' | 'service' | 'professional' | 'faith' | 'leadership';
   icon: React.ReactNode;
   description: string;
   president: string;
@@ -295,6 +295,7 @@ const CATEGORY_LABELS = {
 export default function StudentClubsSection() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [showAll, setShowAll] = useState(false);
 
   const filteredClubs = STUDENT_CLUBS.filter(club => {
     const matchesSearch = club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -303,6 +304,8 @@ export default function StudentClubsSection() {
     return matchesSearch && matchesCategory;
   });
 
+  // Show only 6 unless "View All" is clicked
+  const visibleClubs = showAll ? filteredClubs : filteredClubs.slice(0, 6);
   const categories = Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>;
 
   return (
@@ -354,7 +357,7 @@ export default function StudentClubsSection() {
 
         {/* Clubs Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {filteredClubs.map((club) => (
+          {visibleClubs.map((club) => (
             <Card key={club.id} className="hover:shadow-lg transition-shadow h-full">
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between mb-3">
@@ -500,6 +503,16 @@ export default function StudentClubsSection() {
           ))}
         </div>
 
+        {/* Toggle Button */}
+        <div className="text-center mt-12">
+          {filteredClubs.length > 6 && (
+            <Button size="lg" onClick={() => setShowAll(!showAll)}>
+              {showAll ? "Show Less" : "View All Clubs"}
+            </Button>
+          )}
+        </div>
+        
+        {/* No Results Message */}-
         {filteredClubs.length === 0 && (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
@@ -520,12 +533,14 @@ export default function StudentClubsSection() {
             Connect with peers, develop new skills, and create lasting memories.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg">
+            <Button size="lg" onClick={() => alert('Visit the Student Affairs Office at Room 101, Main Building.')}>
               Visit Student Affairs Office
             </Button>
-            <Button variant="outline" size="lg">
-              <Mail className="w-4 h-4 mr-2" />
-              Contact Us
+            <Button variant="outline" size="lg" asChild>
+              <a href="mailto:studentaffairs@sorsu.edu.ph">
+                <Mail className="w-4 h-4 mr-2" />
+                Contact Us
+              </a>
             </Button>
           </div>
         </div>
