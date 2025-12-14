@@ -41,11 +41,27 @@ class EventController extends Controller
             //     return response()->json(['message' => 'Unauthorized'], 403);
             // }
 
-            $validated = $request->validate([
+            // Convert empty strings to null for date fields
+            $requestData = $request->all();
+            if (isset($requestData['end_date']) && $requestData['end_date'] === '') {
+                $requestData['end_date'] = null;
+            }
+
+            $validated = validator()->make($requestData, [
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'start_date' => 'required|date',
-                'end_date' => 'nullable|date|after_or_equal:start_date',
+                'end_date' => [
+                    'nullable',
+                    'date',
+                    function ($attribute, $value, $fail) use ($requestData) {
+                        if ($value !== null && $value !== '' && isset($requestData['start_date'])) {
+                            if (strtotime($value) < strtotime($requestData['start_date'])) {
+                                $fail('The end date field must be a date after or equal to start date.');
+                            }
+                        }
+                    }
+                ],
                 'location' => 'nullable|string|max:255',
                 'organizer' => 'nullable|string|max:255',
                 'type' => 'nullable|string|max:100',
@@ -56,7 +72,19 @@ class EventController extends Controller
                 'registration_deadline' => 'nullable|date|after_or_equal:now',
                 'tags' => 'nullable|array',
                 'tags.*' => 'string|max:50',
-            ]);
+                'status' => 'nullable|string|in:active,inactive,cancelled',
+                'contactEmail' => 'nullable|email|max:255',
+                'website' => 'nullable|url|max:255',
+                'featured' => 'boolean',
+                'time' => 'nullable|string',
+                'endTime' => 'nullable|string',
+                'date' => 'nullable|date',
+                'endDate' => 'nullable|date',
+                'maxAttendees' => 'nullable|integer|min:1',
+                'registrationRequired' => 'boolean',
+                'registrationDeadline' => 'nullable|date',
+                'isPublic' => 'boolean',
+            ])->validate();
 
             // Start database transaction
             return DB::transaction(function () use ($validated) {
@@ -74,7 +102,7 @@ class EventController extends Controller
                     'registration_required' => $validated['registration_required'] ?? false,
                     'registration_deadline' => $validated['registration_deadline'] ?? null,
                     'tags' => $validated['tags'] ?? [],
-                    'status' => 'active',
+                    'status' => $validated['status'] ?? 'active',
                     'created_by' => 1, // Default to admin user ID for testing
                 ]);
 
@@ -106,11 +134,31 @@ class EventController extends Controller
 
             $event = Event::findOrFail($id);
 
-            $validated = $request->validate([
+            // Convert empty strings to null for date fields
+            $requestData = $request->all();
+            Log::info('Request data before processing:', $requestData);
+            
+            if (isset($requestData['end_date']) && $requestData['end_date'] === '') {
+                $requestData['end_date'] = null;
+            }
+            
+            Log::info('Request data after processing:', $requestData);
+
+            $validated = validator()->make($requestData, [
                 'title' => 'sometimes|required|string|max:255',
                 'description' => 'nullable|string',
                 'start_date' => 'sometimes|required|date',
-                'end_date' => 'nullable|date|after_or_equal:start_date',
+                'end_date' => [
+                    'nullable',
+                    'date',
+                    function ($attribute, $value, $fail) use ($requestData) {
+                        if ($value !== null && $value !== '' && isset($requestData['start_date'])) {
+                            if (strtotime($value) < strtotime($requestData['start_date'])) {
+                                $fail('The end date field must be a date after or equal to start date.');
+                            }
+                        }
+                    }
+                ],
                 'location' => 'nullable|string|max:255',
                 'organizer' => 'nullable|string|max:255',
                 'type' => 'nullable|string|max:100',
@@ -122,7 +170,18 @@ class EventController extends Controller
                 'tags' => 'nullable|array',
                 'tags.*' => 'string|max:50',
                 'status' => 'nullable|string|in:active,inactive,cancelled',
-            ]);
+                'contactEmail' => 'nullable|email|max:255',
+                'website' => 'nullable|url|max:255',
+                'featured' => 'boolean',
+                'time' => 'nullable|string',
+                'endTime' => 'nullable|string',
+                'date' => 'nullable|date',
+                'endDate' => 'nullable|date',
+                'maxAttendees' => 'nullable|integer|min:1',
+                'registrationRequired' => 'boolean',
+                'registrationDeadline' => 'nullable|date',
+                'isPublic' => 'boolean',
+            ])->validate();
 
             // Start database transaction
             return DB::transaction(function () use ($event, $validated) {

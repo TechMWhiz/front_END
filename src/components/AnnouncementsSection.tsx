@@ -51,7 +51,11 @@ export default function AnnouncementsSection() {
   // Convert to student view format and filter only active announcements
   const studentViewAnnouncements = useMemo(() => {
     return announcements
-      .filter(a => a.status === "Published" || a.status === "active")
+      .filter(a => {
+        // Check if announcement has a valid status (Published, active, or no status set)
+        const status = a.status?.toLowerCase();
+        return !status || status === 'published' || status === 'active';
+      })
       .map(a => ({
         id: a.id,
         title: a.title,

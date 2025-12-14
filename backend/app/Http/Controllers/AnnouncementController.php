@@ -42,7 +42,7 @@ class AnnouncementController extends Controller
                 'type' => $request->type ?? 'general',
                 'priority' => $request->priority ?? 'normal',
                 'target_audience' => $request->target_audience ?? 'all',
-                'publish_date' => $request->publish_date,
+                'publish_date' => $request->publish_date ?? now(),
                 'expiry_date' => $request->expiry_date,
                 'is_pinned' => $request->is_pinned ?? false,
                 'status' => $request->status ?? 'Published', // Default to "Published"

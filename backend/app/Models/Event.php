@@ -25,6 +25,17 @@ class Event extends Model
         'tags',
         'status',
         'created_by',
+        'contactEmail',
+        'website',
+        'featured',
+        'time',
+        'endTime',
+        'date',
+        'endDate',
+        'maxAttendees',
+        'registrationRequired',
+        'registrationDeadline',
+        'isPublic',
     ];
 
     protected $casts = [
@@ -33,6 +44,7 @@ class Event extends Model
         'registration_deadline' => 'datetime',
         'is_public' => 'boolean',
         'registration_required' => 'boolean',
+        'featured' => 'boolean',
         'tags' => 'array',
     ];
 }

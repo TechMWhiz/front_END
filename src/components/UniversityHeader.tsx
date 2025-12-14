@@ -25,8 +25,21 @@ export default function UniversityHeader({
     const token = localStorage.getItem('auth_token');
     const userRole = localStorage.getItem('user_role');
     const storedUserName = localStorage.getItem('user_name');
+    
+    // Clear any invalid or incomplete auth data
+    if (!token || !userRole || !storedUserName) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_role');
+      localStorage.removeItem('user_name');
+      return {
+        isAuthenticated: false,
+        userRole: null as 'admin' | 'faculty' | null,
+        userName: undefined
+      };
+    }
+    
     return {
-      isAuthenticated: !!token,
+      isAuthenticated: true,
       userRole: userRole as 'admin' | 'faculty' | null,
       userName: storedUserName || undefined
     };

@@ -26,8 +26,20 @@ const checkAuth = () => {
   const userRole = localStorage.getItem('user_role') as 'admin' | 'faculty' | null;
   const userName = localStorage.getItem('user_name');
   
+  // Clear any invalid or incomplete auth data
+  if (!token || !userRole || !userName) {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('user_name');
+    return {
+      isAuthenticated: false,
+      userRole: null,
+      userName: undefined
+    };
+  }
+  
   return {
-    isAuthenticated: !!token,
+    isAuthenticated: true,
     userRole,
     userName: userName || undefined
   };
@@ -54,9 +66,9 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode,
 };
 
 // Public Layout Component
-const PublicLayout = ({ children }: { children: React.ReactNode }) => (
+const PublicLayout = ({ children, showHeader = true }: { children: React.ReactNode, showHeader?: boolean }) => (
   <>
-    <UniversityHeader />
+    {showHeader && <UniversityHeader />}
     <main>{children}</main>
     <Footer />
     <FAQChatbot />
@@ -126,7 +138,13 @@ export default function App() {
                 } />
                 
                 <Route path="/" element={
-                  <PublicLayout>
+                  <PublicLayout showHeader={false}>
+                    <UniversityHeader
+                      onLoginToggle={handleLoginToggle}
+                      isLoggedIn={authState.isAuthenticated}
+                      userType={authState.userRole || undefined}
+                      userName={authState.userName}
+                    />
                     <>
                       <HeroSection />
                       <ProgramsSection />
