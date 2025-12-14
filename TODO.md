@@ -1,25 +1,42 @@
-# Admin CRUD Functionality Fix
+# Backend Implementation with Laravel
 
-## Issue
-Admin CRUD functionality was not persisting changes after browser refresh or npm run dev restart. Edits to faculty names (Kenneth and Sean) would appear confirmed but disappear when navigating to the Faculty page.
+## Phase 1: Laravel Project Setup
+- [ ] Create new Laravel project in 'backend' subdirectory
+- [ ] Install Laravel Sanctum for authentication
+- [ ] Configure database connection (.env file)
+- [ ] Set up CORS configuration
 
-## Root Cause
-FacultyContext.tsx had a bug where it cleared localStorage on every load, forcing it to always use default data instead of loading saved changes.
+## Phase 2: Database Models and Migrations
+- [ ] Create User model and migration (for authentication)
+- [ ] Create Faculty model and migration
+- [ ] Create Announcement model and migration
+- [ ] Create Event model and migration
+- [ ] Create CalendarItem model and migration
+- [ ] Run migrations
 
-## Fix Applied
-- Modified FacultyContext.tsx to properly load from localStorage if available, otherwise use default data
-- Removed the line that forced clearing localStorage
-- Now matches the pattern used in AnnouncementContext, EventContext, and CalendarContext
+## Phase 3: API Controllers and Routes
+- [ ] Create AuthController for login/logout
+- [ ] Create FacultyController with CRUD operations
+- [ ] Create AnnouncementController with CRUD operations
+- [ ] Create EventController with CRUD operations
+- [ ] Create CalendarController with CRUD operations
+- [ ] Set up API routes with proper middleware
 
-## Testing Required
-- [ ] Test faculty edits persist after refresh
-- [ ] Test faculty edits persist after npm run dev restart
-- [ ] Verify announcements CRUD still works
-- [ ] Verify events CRUD still works
-- [ ] Verify calendar CRUD still works
+## Phase 4: Seed Initial Data
+- [ ] Create database seeders for initial faculty data
+- [ ] Create seeders for sample announcements, events, calendar items
+- [ ] Run seeders
 
-## Status
-- [x] Identified issue in FacultyContext.tsx
-- [x] Applied fix to FacultyContext.tsx
-- [x] Started dev server on port 3002
-- [ ] Test the fix by editing faculty names and refreshing
+## Phase 5: Frontend Integration
+- [x] Update FacultyContext to use API calls instead of localStorage
+- [x] Update AnnouncementContext to use API calls
+- [x] Update EventContext to use API calls
+- [x] Update CalendarContext to use API calls
+- [x] Update login components to authenticate via API
+- [x] Install axios for HTTP requests in frontend
+
+## Phase 6: Testing and Finalization
+- [ ] Test all API endpoints
+- [ ] Test frontend-backend integration
+- [ ] Update any remaining hardcoded data
+- [ ] Final testing and bug fixes

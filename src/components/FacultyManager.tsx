@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -38,7 +38,7 @@ const titles = [
 const statuses = ["Active", "On Leave", "Sabbatical", "Retired", "Inactive"];
 
 export default function FacultyManager() {
-  const { faculty, addFaculty, updateFaculty, deleteFaculty } = useFaculty();
+  const { faculty, loading, addFaculty, updateFaculty, deleteFaculty, refreshFaculty } = useFaculty();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -61,7 +61,12 @@ export default function FacultyManager() {
     website: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Refresh faculty data when component mounts
+  useEffect(() => {
+    refreshFaculty();
+  }, [refreshFaculty]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const facultyData = {
@@ -71,21 +76,42 @@ export default function FacultyManager() {
       awards: formData.awards.split('\n').filter(a => a.trim())
     };
 
-    if (editingFaculty) {
-      // Update existing faculty
-      updateFaculty(editingFaculty.id, facultyData);
-      toast.success("Faculty profile updated successfully!");
-    } else {
-      // Create new faculty
-      const newFaculty: Faculty = {
-        id: Date.now().toString(),
-        ...facultyData
-      };
-      addFaculty(newFaculty);
-      toast.success("Faculty profile created successfully!");
+    try {
+      if (editingFaculty) {
+        // Update existing faculty - only pass the fields that changed
+        const updateData: Partial<Faculty> = {
+          firstName: facultyData.firstName,
+          lastName: facultyData.lastName,
+          email: facultyData.email,
+          phone: facultyData.phone,
+          office: facultyData.office,
+          department: facultyData.department,
+          title: facultyData.title,
+          status: facultyData.status,
+          bio: facultyData.bio,
+          specializations: facultyData.specializations,
+          education: facultyData.education,
+          awards: facultyData.awards,
+          officeHours: facultyData.officeHours,
+          website: facultyData.website
+        };
+        await updateFaculty(editingFaculty.id, updateData);
+        toast.success("Faculty profile updated successfully!");
+      } else {
+        // Create new faculty
+        await addFaculty(facultyData);
+        toast.success("Faculty profile created successfully!");
+      }
+      
+      // Refresh faculty data to show changes
+      await refreshFaculty();
+      
+      setIsCreateDialogOpen(false);
+      resetForm();
+    } catch (error) {
+      console.error('Error saving faculty:', error);
+      toast.error("Failed to save faculty profile. Please try again.");
     }
-    
-    resetForm();
   };
 
   const resetForm = () => {
@@ -130,10 +156,17 @@ export default function FacultyManager() {
     setIsCreateDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteFaculty(id);
-    setDeleteConfirmId(null);
-    toast.success("Faculty profile deleted successfully!");
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteFaculty(id);
+      setDeleteConfirmId(null);
+      toast.success("Faculty profile deleted successfully!");
+      // Don't immediately refresh - let the local state update handle UI
+      // The FacultyContext already handles local state update
+    } catch (error) {
+      console.error('Error deleting faculty:', error);
+      toast.error("Failed to delete faculty profile. Please try again.");
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -406,9 +439,17 @@ export default function FacultyManager() {
                         <Button size="sm" variant="outline" onClick={() => handleEdit(facultyMember)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <AlertDialog open={deleteConfirmId === facultyMember.id} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+                        <AlertDialog open={deleteConfirmId === facultyMember.id} onOpenChange={(open) => {
+                          if (open) {
+                            setDeleteConfirmId(facultyMember.id);
+                          } else {
+                            setDeleteConfirmId(null);
+                          }
+                        }}>
                           <AlertDialogTrigger asChild>
-                        {/* Removed delete button - only editing allowed for Kenneth and Sean */}
+                            <Button size="sm" variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>

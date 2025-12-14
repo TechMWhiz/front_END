@@ -18,7 +18,7 @@ import {
   MapPin
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import CampusMapImg from "../assets/campus map.jpg";
+import CampusMapImg from "../assets/campus_map.jpg";
 
 type LocationType = 'academic' | 'administrative' | 'facilities' | 'recreation' | 'services';
 

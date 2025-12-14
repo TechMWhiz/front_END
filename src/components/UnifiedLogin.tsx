@@ -9,29 +9,37 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Eye, EyeOff, Lock, User, Shield, GraduationCap, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useFaculty } from "../context/FacultyContext";
+import { auth } from "../api";
 
 interface UnifiedLoginProps {
   onLogin: (success: boolean, userType: 'admin' | 'faculty', userData?: any) => void;
   onBack: () => void;
 }
 
-// Mock credentials - In a real app, this would be handled by a secure backend
-const CREDENTIALS = {
-  admin: {
-    username: "admin",
-    password: "sorsu2024",
-    name: "System Administrator",
-    role: "Administrator"
-  },
-  faculty: {
-    username: "faculty",
-    password: "faculty123",
-    name: "Dr. Maria Santos",
-    role: "Faculty Member",
-    department: "Computer Science",
-    employeeId: "FAC-2024-001"
-  }
-};
+interface LoginResponse {
+  success: boolean;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+  token: string;
+  token_type: string;
+  message?: string;
+}
+
+interface ApiErrorResponse {
+  response?: {
+    data: {
+      message: string;
+    };
+  };
+  message: string;
+  data: {
+    message: string;
+  };
+}
 
 export default function UnifiedLogin({ onLogin, onBack }: UnifiedLoginProps) {
   const { faculty } = useFaculty();
@@ -55,43 +63,155 @@ export default function UnifiedLogin({ onLogin, onBack }: UnifiedLoginProps) {
       return;
     }
 
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Clear any existing auth data to prevent conflicts
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('user_name');
+    sessionStorage.removeItem('redirect_after_login');
 
-    if (formData.userType === 'admin') {
-      // Admin login with hardcoded credentials
-      const adminCredentials = CREDENTIALS.admin;
-      if (
-        formData.username === adminCredentials.username &&
-        formData.password === adminCredentials.password
-      ) {
-        toast.success("Welcome to the admin dashboard!");
-        onLogin(true, 'admin', adminCredentials);
-      } else {
-        setError("Invalid username or password. Please try again.");
-        toast.error("Login failed. Please check your credentials.");
-      }
-    } else if (formData.userType === 'faculty') {
-      // Faculty login using faculty context data
-      const facultyMember = faculty.find(f =>
-        f.email === formData.username &&
-        (formData.password === "faculty123" || formData.password === f.lastName.toLowerCase() + "123")
-      );
+    try {
+      console.log('Attempting login with:', {
+        email: formData.username,
+        userType: formData.userType
+      });
 
-      if (facultyMember) {
-        toast.success(`Welcome, ${facultyMember.firstName} ${facultyMember.lastName}!`);
-        onLogin(true, 'faculty', facultyMember);
-      } else {
-        setError("Invalid email or password. Please check your credentials.");
-        toast.error("Login failed. Please check your credentials.");
+      console.log('Making API call to:', 'http://127.0.0.1:8000/api/login');
+
+      // First test if we can reach the backend at all
+      try {
+        const healthCheck = await fetch('http://127.0.0.1:8000/api/health', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
+        });
+        console.log('Health check response:', healthCheck);
+      } catch (healthError) {
+        console.log('Health check failed:', healthError);
       }
+
+      // Test with a simple fetch call first
+      const testResponse = await fetch('http://127.0.0.1:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.username.trim().toLowerCase(),
+          password: formData.password,
+          user_type: formData.userType
+        })
+      });
+
+      console.log('Fetch response:', testResponse);
+      
+      if (!testResponse.ok) {
+        const errorText = await testResponse.text();
+        console.log('Error response text:', errorText);
+        throw new Error(`HTTP error! status: ${testResponse.status} - ${errorText}`);
+      }
+
+      const testData = await testResponse.json();
+      console.log('Fetch response data:', testData);
+
+      // If fetch worked, use that data directly instead of axios
+      if (testData && testData.success && testData.user && testData.token) {
+        const { user, token, success, message } = testData;
+        
+        // Store the token and user data
+        localStorage.setItem('auth_token', token);
+        localStorage.setItem('user_role', user.role);
+        localStorage.setItem('user_name', user.name);
+        
+        console.log('Login successful via fetch:', { user, role: user.role });
+        
+        toast.success(message || `Welcome, ${user.name}!`);
+        onLogin(true, user.role as 'admin' | 'faculty', user);
+        return;
+      }
+
+      const response = await auth.login(
+        formData.username.trim().toLowerCase(),
+        formData.password,
+        formData.userType
+      ) as { data: LoginResponse };
+
+      console.log('Login response received:', response);
+      console.log('Response data:', response.data);
+      
+      if (!response.data) {
+        throw new Error('No response data from server');
+      }
+
+      const { user, token, success, message } = response.data;
+      
+      if (!success || !user || !token) {
+        throw new Error(message || 'Login failed');
+      }
+      
+      // Store the token and user data
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user_role', user.role);
+      localStorage.setItem('user_name', user.name);
+      
+      console.log('Login successful:', { user, role: user.role });
+      
+      // Determine the appropriate redirect path
+      let redirectPath = '/'; // Default fallback
+      
+      if (user.role === 'admin') {
+        redirectPath = '/admin/dashboard';
+      } else if (user.role === 'faculty') {
+        redirectPath = '/faculty/dashboard';
+      }
+      
+      // Get the redirect URL from sessionStorage if it exists
+      const storedRedirect = sessionStorage.getItem('redirect_after_login');
+      if (storedRedirect) {
+        redirectPath = storedRedirect;
+        sessionStorage.removeItem('redirect_after_login');
+      }
+      
+      // Show welcome message and notify parent component
+      toast.success(message || `Welcome, ${user.name}!`);
+      onLogin(true, user.role as 'admin' | 'faculty', user);
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      let errorMessage = "An error occurred. Please try again later.";
+      
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        if (error.response.status === 401) {
+          errorMessage = error.response.data?.message || "Invalid email or password. Please try again.";
+        } else if (error.response.status === 404) {
+          errorMessage = "API endpoint not found. Please check your network connection.";
+        } else if (error.response.status >= 500) {
+          errorMessage = "Server error. Please try again later.";
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        errorMessage = "No response from server. Please check your network connection.";
+      } else {
+        // Something happened in setting up the request
+        errorMessage = error.message || "An error occurred. Please try again.";
+      }
+      
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => ({
+      ...prev, 
+      [field]: field === 'userType' ? (value as 'admin' | 'faculty') : value
+    }));
     if (error) setError(""); // Clear error when user starts typing
   };
 
@@ -127,8 +247,6 @@ export default function UnifiedLogin({ onLogin, onBack }: UnifiedLoginProps) {
         return "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800";
     }
   };
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
@@ -173,7 +291,7 @@ export default function UnifiedLogin({ onLogin, onBack }: UnifiedLoginProps) {
                 <Label htmlFor="userType">User Type</Label>
                 <Select
                   value={formData.userType}
-                  onValueChange={(value: 'admin' | 'faculty') => handleInputChange("userType", value)}
+                  onValueChange={(value: string) => handleInputChange("userType", value)}
                   disabled={isLoading}
                 >
                   <SelectTrigger>
@@ -204,7 +322,7 @@ export default function UnifiedLogin({ onLogin, onBack }: UnifiedLoginProps) {
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     id="username"
-                    type="text"
+                    type={formData.userType === 'faculty' ? 'email' : 'text'}
                     placeholder=""
                     value={formData.username}
                     onChange={(e) => handleInputChange("username", e.target.value)}

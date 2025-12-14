@@ -1,25 +1,56 @@
 import React from "react";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { GraduationCap, MapPin, Users, Award, Settings, LogIn, LogOut, Shield, Menu } from "lucide-react";
-import Logo from "../assets/sorsulogo.png"; // Add this import
-
+import { GraduationCap, MapPin, Users, Award, Settings, LogIn, LogOut, Shield } from "lucide-react";
+import Logo from "../assets/sorsulogo.png";
 
 interface UniversityHeaderProps {
-  onLoginToggle: () => void;
-  isLoggedIn: boolean;
+  onLoginToggle?: () => void;
+  isLoggedIn?: boolean;
   userType?: 'admin' | 'faculty';
   userName?: string;
 }
 
 export default function UniversityHeader({ 
   onLoginToggle, 
-  isLoggedIn,
+  isLoggedIn = false,
   userType,
   userName
 }: UniversityHeaderProps) {
-  const [menuOpen, setMenuOpen] = useState(false); // 👈 Step 1
+  const navigate = useNavigate();
+
+  // Check authentication from localStorage if props not provided
+  const checkAuth = () => {
+    const token = localStorage.getItem('auth_token');
+    const userRole = localStorage.getItem('user_role');
+    const storedUserName = localStorage.getItem('user_name');
+    return {
+      isAuthenticated: !!token,
+      userRole: userRole as 'admin' | 'faculty' | null,
+      userName: storedUserName || undefined
+    };
+  };
+
+  const authState = isLoggedIn && userType && userName ? 
+    { isAuthenticated: true, userRole: userType, userName } : 
+    checkAuth();
+
+  const handleLoginToggle = () => {
+    if (onLoginToggle) {
+      onLoginToggle();
+    } else {
+      // Default navigation behavior
+      if (authState.isAuthenticated) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_role');
+        localStorage.removeItem('user_name');
+        navigate('/');
+      } else {
+        navigate('/login');
+      }
+    }
+  };
 
   return (
     <header className="border-b bg-white">
@@ -36,8 +67,8 @@ export default function UniversityHeader({
           </div>
           
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-4">
-            {!isLoggedIn && (
+          <nav className="flex items-center gap-4">
+            {!authState.isAuthenticated && (
               <>
                 <a href="#programs" className="hover:text-primary transition-colors text-sm">Programs</a>
                 <a href="#campus" className="hover:text-primary transition-colors text-sm">Campus</a>
@@ -48,26 +79,26 @@ export default function UniversityHeader({
               </>
             )}
             <div className="flex items-center gap-3">
-              {isLoggedIn && userName && (
+              {authState.isAuthenticated && authState.userName && (
                 <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-full">
-                  {userType === 'admin' ? (
+                  {authState.userRole === 'admin' ? (
                     <Shield className="w-4 h-4 text-blue-600" />
                   ) : (
                     <GraduationCap className="w-4 h-4 text-purple-600" />
                   )}
-                  <span className="text-sm font-medium">{userName}</span>
+                  <span className="text-sm font-medium">{authState.userName}</span>
                   <Badge variant="secondary" className="text-xs">
-                    {userType === 'admin' ? 'Admin' : 'Faculty'}
+                    {authState.userRole === 'admin' ? 'Admin' : 'Faculty'}
                   </Badge>
                 </div>
               )}
               <Button 
-                variant={isLoggedIn ? "default" : "outline"} 
+                variant={authState.isAuthenticated ? "default" : "outline"} 
                 size="sm"
-                onClick={onLoginToggle}
+                onClick={handleLoginToggle}
                 className="flex items-center gap-2"
               >
-                {isLoggedIn ? (
+                {authState.isAuthenticated ? (
                   <>
                     <LogOut className="w-4 h-4" />
                     Logout
@@ -81,44 +112,7 @@ export default function UniversityHeader({
               </Button>
             </div>
           </nav>
-
-
-          {/* Mobile Nav */}
-          {menuOpen && (
-          <div className="md:hidden mt-3 flex flex-col gap-2 text-sm">
-            {!isLoggedIn && (
-              <>
-                <a href="#programs" className="hover:text-primary">Programs</a>
-                <a href="#campus" className="hover:text-primary">Campus</a>
-                <a href="#departments" className="hover:text-primary">Departments</a>
-                <a href="#faculty" className="hover:text-primary">Faculty</a>
-                <a href="#announcements" className="hover:text-primary">Announcements</a>
-                <a href="#events" className="hover:text-primary">Events</a>
-              </>
-            )}
-            <Button
-              variant={isLoggedIn ? "default" : "outline"}
-              size="sm"
-              onClick={onLoginToggle}
-              className="flex items-center gap-2 mt-2"
-            >
-              {isLoggedIn ? (
-                <>
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </>
-              ) : (
-                <>
-                  <LogIn className="w-4 h-4" />
-                  Login
-                </>
-              )}
-            </Button>
-          </div>
-        )}
-          
         </div>
-        
         <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4" />
@@ -127,10 +121,6 @@ export default function UniversityHeader({
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4" />
             <span>3,500+ Students</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Award className="w-4 h-4" />
-            <span>AACCUP Level II Accredited</span>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import UniversityHeader from "./components/UniversityHeader";
 import HeroSection from "./components/HeroSection";
 import ProgramsSection from "./components/ProgramsSection";
@@ -19,85 +20,157 @@ import { AnnouncementProvider } from "./context/AnnouncementContext";
 import { EventProvider } from "./context/EventContext";
 import { CalendarProvider } from "./context/CalendarContext";
 
+// Check for existing auth token on initial load
+const checkAuth = () => {
+  const token = localStorage.getItem('auth_token');
+  const userRole = localStorage.getItem('user_role') as 'admin' | 'faculty' | null;
+  const userName = localStorage.getItem('user_name');
+  
+  return {
+    isAuthenticated: !!token,
+    userRole,
+    userName: userName || undefined
+  };
+};
+
+// Protected Route component
+const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole?: 'admin' | 'faculty' }) => {
+  const auth = checkAuth();
+  const location = useLocation();
+
+  if (!auth.isAuthenticated) {
+    // Store the current location they were trying to go to
+    sessionStorage.setItem('redirect_after_login', location.pathname + location.search);
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (requiredRole && auth.userRole !== requiredRole) {
+    // Redirect to appropriate dashboard or home if user doesn't have required role
+    const redirectTo = auth.userRole === 'admin' ? '/admin/dashboard' : '/faculty/dashboard';
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Public Layout Component
+const PublicLayout = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <UniversityHeader />
+    <main>{children}</main>
+    <Footer />
+    <FAQChatbot />
+  </>
+);
+
+// Main App Component
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [userType, setUserType] = useState<'admin' | 'faculty' | null>(null);
-  const [userData, setUserData] = useState<any>(null);
+  const [authState, setAuthState] = useState(() => {
+    // Clear any stored redirect on app initialization
+    sessionStorage.removeItem('redirect_after_login');
+    return checkAuth();
+  });
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLoginToggle = () => {
-    if (isLoggedIn) {
+    if (authState.isAuthenticated) {
       // Logout
-      setIsLoggedIn(false);
-      setUserType(null);
-      setUserData(null);
-      setShowLogin(false);
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_role');
+      localStorage.removeItem('user_name');
+      setAuthState({ isAuthenticated: false, userRole: null, userName: undefined });
+      navigate('/');
     } else {
-      // Show login page
-      setShowLogin(true);
+      // Show login
+      navigate('/login');
     }
   };
 
   const handleLogin = (success: boolean, type: 'admin' | 'faculty', data?: any) => {
     if (success) {
-      setIsLoggedIn(true);
-      setUserType(type);
-      setUserData(data);
-      setShowLogin(false);
+      const newAuthState = {
+        isAuthenticated: true,
+        userRole: type,
+        userName: data?.name
+      };
+      setAuthState(newAuthState);
+      
+      // Redirect to intended URL or dashboard
+      const redirectPath = sessionStorage.getItem('redirect_after_login') || 
+                         (type === 'admin' ? '/admin/dashboard' : '/faculty/dashboard');
+      sessionStorage.removeItem('redirect_after_login');
+      navigate(redirectPath);
     }
   };
 
   const handleBackToSite = () => {
-    setShowLogin(false);
+    navigate('/');
   };
 
-  // Show login page when requested
-  if (showLogin && !isLoggedIn) {
-    return (
-      <FacultyProvider>
-        <AnnouncementProvider>
-          <EventProvider>
-            <CalendarProvider>
-              <UnifiedLogin onLogin={handleLogin} onBack={handleBackToSite} />
-              <Toaster />
-            </CalendarProvider>
-          </EventProvider>
-        </AnnouncementProvider>
-      </FacultyProvider>
-    );
-  }
-
+  // Main app content with React Router
   return (
     <FacultyProvider>
       <AnnouncementProvider>
         <EventProvider>
           <CalendarProvider>
             <div className="min-h-screen bg-white">
-              <UniversityHeader
-                onLoginToggle={handleLoginToggle}
-                isLoggedIn={isLoggedIn}
-                userType={userType || undefined}
-                userName={userData?.name}
-              />
-              <main>
-                {isLoggedIn && userType === 'admin' ? (
-                  <AdminDashboard />
-                ) : isLoggedIn && userType === 'faculty' ? (
-                  <FacultyDashboard userData={userData} />
-                ) : (
-                  <>
-                    <HeroSection />
-                    <ProgramsSection />
-                    <CampusSection />
-                    <DepartmentsSection />
-                    <FacultySection />
-                    <AnnouncementsSection />
-                    <EventsSection />
-                  </>
-                )}
-              </main>
-              {!isLoggedIn && <Footer />}
-              {!isLoggedIn && <FAQChatbot />}
+              <Routes>
+                {/* Public Routes - No authentication required */}
+                <Route path="/login" element={
+                  authState.isAuthenticated ? (
+                    <Navigate to={authState.userRole === 'admin' ? '/admin/dashboard' : '/faculty/dashboard'} replace />
+                  ) : (
+                    <UnifiedLogin onLogin={handleLogin} onBack={handleBackToSite} />
+                  )
+                } />
+                
+                <Route path="/" element={
+                  <PublicLayout>
+                    <>
+                      <HeroSection />
+                      <ProgramsSection />
+                      <CampusSection />
+                      <DepartmentsSection />
+                      <FacultySection />
+                      <AnnouncementsSection />
+                      <EventsSection />
+                    </>
+                  </PublicLayout>
+                } />
+
+                {/* Admin Protected Routes */}
+                <Route path="/admin/dashboard" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <UniversityHeader
+                      onLoginToggle={handleLoginToggle}
+                      isLoggedIn={authState.isAuthenticated}
+                      userType={authState.userRole || undefined}
+                      userName={authState.userName}
+                    />
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+
+                {/* Faculty Protected Routes */}
+                <Route path="/faculty/dashboard" element={
+                  <ProtectedRoute requiredRole="faculty">
+                    <UniversityHeader
+                      onLoginToggle={handleLoginToggle}
+                      isLoggedIn={authState.isAuthenticated}
+                      userType={authState.userRole || undefined}
+                      userName={authState.userName}
+                    />
+                    <FacultyDashboard userData={{ name: authState.userName }} />
+                  </ProtectedRoute>
+                } />
+
+                {/* Catch all other routes - redirect to home */}
+                <Route path="*" element={
+                  <Navigate to="/" replace />
+                } />
+              </Routes>
+              
               <Toaster />
             </div>
           </CalendarProvider>

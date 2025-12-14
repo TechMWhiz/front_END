@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -29,69 +29,84 @@ const audiences = ["Students", "Faculty & Staff", "Public", "All"];
 const statuses = ["Draft", "Scheduled", "Published", "Expired"];
 
 export default function AnnouncementManager() {
-  const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useAnnouncements();
+  const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement, refreshAnnouncements } = useAnnouncements();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    category: "",
+    type: "",
     priority: "Medium",
-    audience: "",
-    publishDate: "",
-    expiryDate: "",
-    tags: "",
-    isPinned: false
+    target_audience: "",
+    publish_date: "",
+    expiry_date: "",
+    is_pinned: false
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Refresh announcements data when component mounts
+  useEffect(() => {
+    refreshAnnouncements();
+  }, [refreshAnnouncements]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (editingAnnouncement) {
-      // Update existing announcement
-      const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
-      updateAnnouncement(editingAnnouncement.id, {
-        ...formData,
-        status: editingAnnouncement.status || "Published",
-        type: formData.category,
-        targetAudience: formData.audience,
-        isPinned: formData.isPinned !== undefined ? formData.isPinned : (editingAnnouncement.isPinned || false),
-        tags: tagsArray.length > 0 ? tagsArray : (editingAnnouncement.tags || [])
-      });
-      toast.success("Announcement updated successfully!");
-    } else {
-      // Create new announcement
-      const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
-      const newAnnouncement: Announcement = {
-        id: Date.now().toString(),
-        ...formData,
-        status: "Published",
-        author: "Admin User",
-        views: 0,
-        type: formData.category,
-        targetAudience: formData.audience,
-        isPinned: formData.isPinned || false,
-        tags: tagsArray
-      };
-      addAnnouncement(newAnnouncement);
-      toast.success("Announcement created successfully!");
+    try {
+      if (editingAnnouncement) {
+        // Update existing announcement
+        await updateAnnouncement(editingAnnouncement.id, {
+          title: formData.title,
+          content: formData.content,
+          type: formData.type,
+          priority: formData.priority,
+          target_audience: formData.target_audience,
+          publish_date: formData.publish_date || undefined,
+          expiry_date: formData.expiry_date || undefined,
+          is_pinned: formData.is_pinned,
+          status: editingAnnouncement.status || "Published" // Use "Published" as default
+        });
+        toast.success("Announcement updated successfully!");
+      } else {
+        // Create new announcement
+        const newAnnouncement = {
+          title: formData.title,
+          content: formData.content,
+          type: formData.type,
+          priority: formData.priority,
+          target_audience: formData.target_audience,
+          publish_date: formData.publish_date || new Date().toISOString().split('T')[0],
+          expiry_date: formData.expiry_date || undefined,
+          is_pinned: formData.is_pinned,
+          status: "Published", // Use "Published" instead of "active"
+          views: 0,
+          created_by: 1, // Use user ID 1 (admin)
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        await addAnnouncement(newAnnouncement);
+        toast.success("Announcement created successfully!");
+      }
+      
+      // Refresh announcements data to show changes
+      await refreshAnnouncements();
+      resetForm();
+    } catch (error) {
+      console.error('Error saving announcement:', error);
+      toast.error("Failed to save announcement. Please try again.");
     }
-    
-    resetForm();
   };
 
   const resetForm = () => {
     setFormData({
       title: "",
       content: "",
-      category: "",
+      type: "",
       priority: "Medium",
-      audience: "",
-      publishDate: "",
-      expiryDate: "",
-      tags: "",
-      isPinned: false
+      target_audience: "",
+      publish_date: "",
+      expiry_date: "",
+      is_pinned: false
     });
     setEditingAnnouncement(null);
     setIsCreateDialogOpen(false);
@@ -102,21 +117,27 @@ export default function AnnouncementManager() {
     setFormData({
       title: announcement.title,
       content: announcement.content,
-      category: announcement.category,
+      type: announcement.type || announcement.category || "",
       priority: announcement.priority,
-      audience: announcement.audience,
-      publishDate: announcement.publishDate,
-      expiryDate: announcement.expiryDate || "",
-      tags: announcement.tags ? announcement.tags.join(', ') : "",
-      isPinned: announcement.isPinned || false
+      target_audience: announcement.target_audience || announcement.audience || "",
+      publish_date: announcement.publish_date || announcement.publishDate || "",
+      expiry_date: announcement.expiry_date || announcement.expiryDate || "",
+      is_pinned: announcement.is_pinned || announcement.isPinned || false
     });
     setIsCreateDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteAnnouncement(id);
-    setDeleteConfirmId(null);
-    toast.success("Announcement deleted successfully!");
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteAnnouncement(id);
+      setDeleteConfirmId(null);
+      toast.success("Announcement deleted successfully!");
+      // Refresh announcements data to show changes
+      await refreshAnnouncements();
+    } catch (error) {
+      console.error('Error deleting announcement:', error);
+      toast.error("Failed to delete announcement. Please try again.");
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -174,10 +195,10 @@ export default function AnnouncementManager() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+                  <Label htmlFor="type">Type</Label>
+                  <Select value={formData.type} onValueChange={(value) => setFormData({...formData, type: value})}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map(cat => (
@@ -214,8 +235,8 @@ export default function AnnouncementManager() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="audience">Audience</Label>
-                  <Select value={formData.audience} onValueChange={(value) => setFormData({...formData, audience: value})}>
+                  <Label htmlFor="target_audience">Audience</Label>
+                  <Select value={formData.target_audience} onValueChange={(value) => setFormData({...formData, target_audience: value})}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select audience" />
                     </SelectTrigger>
@@ -227,12 +248,12 @@ export default function AnnouncementManager() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="publishDate">Publish Date</Label>
+                  <Label htmlFor="publish_date">Publish Date</Label>
                   <Input
-                    id="publishDate"
+                    id="publish_date"
                     type="date"
-                    value={formData.publishDate}
-                    onChange={(e) => setFormData({...formData, publishDate: e.target.value})}
+                    value={formData.publish_date}
+                    onChange={(e) => setFormData({...formData, publish_date: e.target.value})}
                     required
                   />
                 </div>
@@ -240,36 +261,26 @@ export default function AnnouncementManager() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="expiryDate">Expiry Date (Optional)</Label>
+                  <Label htmlFor="expiry_date">Expiry Date (Optional)</Label>
                   <Input
-                    id="expiryDate"
+                    id="expiry_date"
                     type="date"
-                    value={formData.expiryDate}
-                    onChange={(e) => setFormData({...formData, expiryDate: e.target.value})}
+                    value={formData.expiry_date}
+                    onChange={(e) => setFormData({...formData, expiry_date: e.target.value})}
                   />
                 </div>
                 <div className="flex items-end">
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      id="isPinned"
-                      checked={formData.isPinned}
-                      onChange={(e) => setFormData({...formData, isPinned: e.target.checked})}
+                      id="is_pinned"
+                      checked={formData.is_pinned}
+                      onChange={(e) => setFormData({...formData, is_pinned: e.target.checked})}
                       className="rounded"
                     />
-                    <Label htmlFor="isPinned">Pin to top</Label>
+                    <Label htmlFor="is_pinned">Pin to top</Label>
                   </div>
                 </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="tags">Tags (comma-separated)</Label>
-                <Input
-                  id="tags"
-                  value={formData.tags}
-                  onChange={(e) => setFormData({...formData, tags: e.target.value})}
-                  placeholder="Academic, Deadline, Important"
-                />
               </div>
               
               <div className="flex gap-2 justify-end">
@@ -299,9 +310,9 @@ export default function AnnouncementManager() {
                     </Badge>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>Category: {announcement.category}</span>
-                    <span>Audience: {announcement.audience}</span>
-                    <span>Author: {announcement.author}</span>
+                    <span>Type: {announcement.type || announcement.category}</span>
+                    <span>Audience: {announcement.target_audience || announcement.audience}</span>
+                    <span>Author: {announcement.author || "Admin"}</span>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -341,11 +352,11 @@ export default function AnnouncementManager() {
                 <div className="flex items-center gap-4">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    Published: {new Date(announcement.publishDate).toLocaleDateString()}
+                    Published: {new Date(announcement.publish_date || announcement.publishDate || announcement.created_at).toLocaleDateString()}
                   </span>
-                  {announcement.expiryDate && (
+                  {(announcement.expiry_date || announcement.expiryDate) && (
                     <span>
-                      Expires: {new Date(announcement.expiryDate).toLocaleDateString()}
+                      Expires: {new Date(announcement.expiry_date || announcement.expiryDate || '').toLocaleDateString()}
                     </span>
                   )}
                 </div>
