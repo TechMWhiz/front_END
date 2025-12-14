@@ -54,16 +54,16 @@ const mockDepartments: Department[] = [
     email: "cet@sorsu-bulan.edu.ph",
     phone: "+63 56 311 1234",
     website: "https://sorsu-bulan.edu.ph/cet",
-    programs: ACADEMIC_PROGRAMS,
-    facultyCount: 28,
-    studentCount: 850,
+    programs: ["Bachelor of Science in Computer Science", "Bachelor of Science in Information Technology", "Bachelor of Science in Information Systems", "Bachelor of Technical Vocational Teacher Education major in Computer System Servicing"],
+    facultyCount: 25,
+    studentCount: 700,
     accreditation: ["AACCUP Level II", "PRC Accredited", "CHED Center of Excellence"],
     researchAreas: [
-      "Sustainable Engineering",
       "Artificial Intelligence",
-      "Renewable Energy Systems",
-      "Smart Infrastructure",
-      "Software Development"
+      "Software Development",
+      "Cybersecurity",
+      "Data Science",
+      "Internet of Things"
     ],
     facilities: [
       "Computer Laboratories (5 units)",
@@ -84,82 +84,6 @@ const mockDepartments: Department[] = [
   },
   {
     id: "2",
-    name: "College of Arts and Sciences",
-    shortName: "CAS",
-    description: "The College of Arts and Sciences provides foundational education in liberal arts, sciences, and mathematics. We nurture critical thinking, creativity, and scientific inquiry among our students.",
-    dean: "Dr. Carmen Villanueva",
-    establishedYear: 1985,
-    location: "Academic Building, SorSU-Bulan Campus",
-    email: "cas@sorsu-bulan.edu.ph",
-    phone: "+63 56 311 1235",
-    programs: ACADEMIC_PROGRAMS,
-    facultyCount: 22,
-    studentCount: 650,
-    accreditation: ["AACCUP Level I", "CHED Recognized"],
-    researchAreas: [
-      "Applied Mathematics",
-      "Environmental Biology",
-      "Chemical Analysis",
-      "Language Studies",
-      "Behavioral Psychology"
-    ],
-    facilities: [
-      "Science Laboratories (4 units)",
-      "Mathematics Learning Center",
-      "Language Laboratory",
-      "Psychology Laboratory",
-      "Herbarium",
-      "Research Center"
-    ],
-    achievements: [
-      "Best Liberal Arts Program 2023",
-      "Outstanding Research in Sciences 2022",
-      "Excellence in Mathematics Education 2021",
-      "Language Proficiency Awards 2020"
-    ],
-    mission: "To provide comprehensive liberal arts and sciences education that develops critical thinking, scientific literacy, and cultural appreciation.",
-    vision: "To be a leading college of arts and sciences that produces well-rounded individuals capable of contributing to society through knowledge and service."
-  },
-  {
-    id: "3",
-    name: "College of Teacher Education",
-    shortName: "CTE",
-    description: "The College of Teacher Education is dedicated to preparing competent, caring, and reflective teachers who will shape the future of education in the Philippines.",
-    dean: "Dr. Jennifer Aquino",
-    establishedYear: 1980,
-    location: "Teacher Education Building, SorSU-Bulan Campus",
-    email: "cte@sorsu-bulan.edu.ph",
-    phone: "+63 56 311 1236",
-    programs: ACADEMIC_PROGRAMS,
-    facultyCount: 18,
-    studentCount: 500,
-    accreditation: ["AACCUP Level II", "CHED Center of Development"],
-    researchAreas: [
-      "Curriculum Development",
-      "Educational Technology",
-      "Learning Assessment",
-      "Teacher Professional Development",
-      "Inclusive Education"
-    ],
-    facilities: [
-      "Practice Teaching Rooms",
-      "Educational Technology Center",
-      "Demonstration School",
-      "Learning Resource Center",
-      "Sports Facility",
-      "Music Room"
-    ],
-    achievements: [
-      "Outstanding Teacher Education Program 2023",
-      "Top Performing School in LET 2022",
-      "Excellence in Practicum Program 2021",
-      "Best Student Teachers Performance 2020"
-    ],
-    mission: "To develop competent, caring, and reflective teachers who are committed to lifelong learning and professional excellence.",
-    vision: "To be the premier teacher education institution in the region, known for producing world-class educators."
-  },
-  {
-    id: "4",
     name: "College of Business and Management",
     shortName: "CBM",
     description: "The College of Business and Management prepares future business leaders and entrepreneurs with strong ethical foundations and innovative mindsets for the global marketplace.",
@@ -168,16 +92,17 @@ const mockDepartments: Department[] = [
     location: "Business Building, SorSU-Bulan Campus",
     email: "cbm@sorsu-bulan.edu.ph",
     phone: "+63 56 311 1237",
-    programs: ACADEMIC_PROGRAMS,
+    website: "https://sorsu-bulan.edu.ph/cbm",
+    programs: ["Bachelor of Science in Accountancy", "Bachelor of Science in Accounting Information System", "Bachelor in Public Administration", "Bachelor of Science in Entrepreneurship"],
     facultyCount: 20,
-    studentCount: 750,
+    studentCount: 600,
     accreditation: ["AACCUP Level I", "AACSB Candidate"],
     researchAreas: [
       "Digital Marketing",
-      "Small Business Development",
       "Financial Analytics",
-      "Organizational Behavior",
-      "Sustainable Business Practices"
+      "Entrepreneurship",
+      "Public Administration",
+      "Business Ethics"
     ],
     facilities: [
       "Business Simulation Laboratory",
@@ -195,45 +120,6 @@ const mockDepartments: Department[] = [
     ],
     mission: "To develop ethical business leaders and entrepreneurs who contribute to economic development and social progress.",
     vision: "To be a premier business education institution recognized for academic excellence, research innovation, and industry relevance."
-  },
-  {
-    id: "5",
-    name: "College of Agriculture",
-    shortName: "COA",
-    description: "The College of Agriculture focuses on sustainable agricultural practices, food security, and rural development. We train the next generation of agricultural professionals and researchers.",
-    dean: "Dr. Roberto Fernandez",
-    establishedYear: 1988,
-    location: "Agriculture Building, SorSU-Bulan Campus",
-    email: "coa@sorsu-bulan.edu.ph",
-    phone: "+63 56 311 1238",
-    programs: ACADEMIC_PROGRAMS,
-    facultyCount: 16,
-    studentCount: 400,
-    accreditation: ["AACCUP Level I", "DA Recognized"],
-    researchAreas: [
-      "Sustainable Agriculture",
-      "Crop Science",
-      "Animal Nutrition",
-      "Food Processing",
-      "Agricultural Economics",
-      "Aquaculture"
-    ],
-    facilities: [
-      "Demonstration Farm (50 hectares)",
-      "Livestock Facility",
-      "Food Processing Laboratory",
-      "Soil Testing Laboratory",
-      "Greenhouse Complex",
-      "Fish Ponds"
-    ],
-    achievements: [
-      "Best Agricultural Research 2023",
-      "Outstanding Extension Program 2022",
-      "Sustainable Farming Innovation Award 2021",
-      "Community Impact Excellence 2020"
-    ],
-    mission: "To advance agricultural science and technology for sustainable food production and rural development.",
-    vision: "To be the leading agricultural education and research institution in the region, contributing to food security and environmental sustainability."
   }
 ];
 
@@ -249,11 +135,11 @@ export default function DepartmentsSection() {
     );
   };
 
-  const filteredDepartments = mockDepartments.filter(dept => 
+  const filteredDepartments = mockDepartments.filter((dept: Department) =>
     dept.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     dept.shortName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     dept.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dept.programs.some(program => program.toLowerCase().includes(searchTerm.toLowerCase()))
+    dept.programs.some((program: string) => program.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (

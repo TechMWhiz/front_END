@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import api from '../api';
 
 // Unified Faculty interface that works for both admin and student views
 export interface Faculty {
@@ -25,152 +26,316 @@ export interface Faculty {
 
 interface FacultyContextType {
   faculty: Faculty[];
-  addFaculty: (faculty: Faculty) => void;
-  updateFaculty: (id: string, faculty: Partial<Faculty>) => void;
-  deleteFaculty: (id: string) => void;
+  loading: boolean;
+  addFaculty: (faculty: Omit<Faculty, 'id'>) => Promise<Faculty>;
+  updateFaculty: (id: string, faculty: Partial<Faculty>) => Promise<Faculty>;
+  deleteFaculty: (id: string) => Promise<void>;
   getFacultyById: (id: string) => Faculty | undefined;
+  refreshFaculty: () => Promise<void>;
 }
 
 const FacultyContext = createContext<FacultyContextType | undefined>(undefined);
 
-// Default mock data
+// Default mock data - Initial faculty members
 const defaultFaculty: Faculty[] = [
   {
     id: "1",
-    firstName: "Dr. Sarah",
-    lastName: "Johnson",
-    email: "s.johnson@university.edu",
-    phone: "(555) 123-4567",
-    office: "Science Building 301",
-    department: "Computer Science",
-    title: "Professor",
-    status: "Active",
-    bio: "Dr. Johnson specializes in artificial intelligence and machine learning research with over 15 years of experience in the field.",
-    specializations: ["Artificial Intelligence", "Machine Learning", "Data Science"],
-    education: ["Ph.D. Computer Science - MIT", "M.S. Computer Science - Stanford"],
-    awards: ["Excellence in Teaching Award 2023", "Research Innovation Grant 2022"],
-    officeHours: "Mon/Wed 2-4 PM",
-    website: "https://cs.university.edu/faculty/johnson",
-    researchInterests: ["AI", "Machine Learning", "Data Science"],
-    yearsOfExperience: 15
-  },
-  {
-    id: "2",
-    firstName: "Prof. Michael",
-    lastName: "Chen",
-    email: "m.chen@university.edu",
-    phone: "(555) 234-5678",
-    office: "Business Building 205",
-    department: "Business Administration",
-    title: "Associate Professor",
-    status: "Active",
-    bio: "Professor Chen focuses on international business strategy and has consulted for Fortune 500 companies worldwide.",
-    specializations: ["International Business", "Strategic Management", "Corporate Finance"],
-    education: ["Ph.D. Business Administration - Harvard", "MBA - Wharton"],
-    awards: ["Outstanding Faculty Award 2021"],
-    officeHours: "Tue/Thu 1-3 PM",
-    researchInterests: ["International Business", "Strategy"],
-    yearsOfExperience: 12
-  },
-  {
-    id: "3",
-    firstName: "Dr. Emily",
-    lastName: "Rodriguez",
-    email: "e.rodriguez@university.edu",
-    phone: "(555) 345-6789",
-    office: "Arts Building 102",
-    department: "Psychology",
+    firstName: "Kenneth",
+    lastName: "Gisalan",
+    email: "kenneth.gisalan@sorsu-bulan.edu.ph",
+    phone: "+63 919 345 6789",
+    office: "Engineering Building, Room 203",
+    department: "Information Technology",
     title: "Assistant Professor",
     status: "Active",
-    bio: "Dr. Rodriguez researches cognitive psychology and human behavior, with a focus on memory and learning processes.",
-    specializations: ["Cognitive Psychology", "Memory Research", "Learning Sciences"],
-    education: ["Ph.D. Psychology - UCLA", "M.A. Psychology - UC Berkeley"],
-    awards: [],
-    officeHours: "Currently on sabbatical",
-    researchInterests: ["Cognitive Psychology", "Memory"],
+    bio: "Prof. Gisalan is an IT expert specializing in cybersecurity, network administration, and software development. He brings industry experience to the classroom and is passionate about preparing students for the digital workforce.",
+    specializations: ["Information Technology", "Cybersecurity", "Network Administration", "Software Development"],
+    education: [
+      "M.S. in Information Technology, University of the Philippines Diliman",
+      "B.S. in Computer Science, Ateneo de Manila University"
+    ],
+    awards: [
+      "Outstanding IT Educator Award 2023",
+      "Best Cybersecurity Research Paper 2022"
+    ],
+    officeHours: "Tue/Thu 2-4 PM",
+    researchInterests: ["Cybersecurity", "Network Security", "Cloud Computing", "Digital Forensics"],
     yearsOfExperience: 8
   },
   {
-    id: "4",
-    firstName: "Dr. Maria Elena",
-    lastName: "Santos",
-    email: "me.santos@sorsu-bulan.edu.ph",
-    phone: "+63 917 123 4567",
-    office: "Engineering Building, Room 201",
-    department: "College of Engineering and Technology",
-    title: "Dean",
+    id: "2",
+    firstName: "Sean Martin",
+    lastName: "Fulay",
+    email: "sean.fulay@sorsu-bulan.edu.ph",
+    phone: "+63 917 888 5566",
+    office: "Engineering Building, Room 204",
+    department: "Information Technology",
+    title: "IT Specialist Instructor",
     status: "Active",
-    bio: "Dr. Santos has over 20 years of experience in civil engineering and academia. She has led numerous infrastructure projects in Bicol Region and is passionate about sustainable engineering practices.",
-    specializations: ["Civil Engineering", "Structural Engineering", "Project Management"],
-    education: ["Ph.D. in Civil Engineering, University of the Philippines Diliman"],
-    awards: ["Outstanding Engineering Educator Award 2022", "Best Research Paper in Structural Engineering 2021", "CHED Outstanding Faculty Award 2020"],
-    officeHours: "Mon-Fri 9-5 PM",
-    researchInterests: ["Earthquake-resistant structures", "Sustainable building materials", "Infrastructure development"],
-    yearsOfExperience: 20
-  },
-  {
-    id: "5",
-    firstName: "Prof. Roberto",
-    lastName: "dela Cruz",
-    email: "r.delacruz@sorsu-bulan.edu.ph",
-    phone: "+63 918 234 5678",
-    office: "Engineering Building, Room 105",
-    department: "College of Engineering and Technology",
-    title: "Program Chair",
-    status: "Active",
-    bio: "Prof. dela Cruz is a technology enthusiast with expertise in software development and AI. He has mentored hundreds of students in programming and system development.",
-    specializations: ["Computer Science", "Software Engineering", "Artificial Intelligence"],
-    education: ["M.S. in Computer Science, Ateneo de Manila University"],
-    awards: ["Best IT Faculty Award 2023", "Innovation in Teaching Award 2022", "Outstanding Alumni Award - Ateneo de Manila 2021"],
-    officeHours: "Mon/Wed/Fri 10-12 PM",
-    researchInterests: ["Machine Learning", "Web Development", "Mobile Applications", "Database Systems"],
-    yearsOfExperience: 15
+    bio: "Mr. Fulay is an IT specialist with strong expertise in software development, system administration, and emerging technologies. He is dedicated to helping students build practical technical skills aligned with industry standards.",
+    specializations: [
+      "Software Development",
+      "IT Infrastructure",
+      "Network Systems",
+      "Database Management"
+    ],
+    education: [
+      "B.S. in Information Technology, Sorsogon State University",
+      "Cisco Networking Certification (CCNA)"
+    ],
+    awards: ["Excellence in IT Instruction Award 2024"],
+    officeHours: "Mon/Wed/Fri 1-3 PM",
+    researchInterests: [
+      "IT Infrastructure",
+      "Web Development",
+      "Cloud Services",
+      "Systems Administration"
+    ],
+    yearsOfExperience: 5
   }
 ];
 
 const STORAGE_KEY = 'university_faculty_data';
 
 export function FacultyProvider({ children }: { children: ReactNode }) {
-  const [faculty, setFaculty] = useState<Faculty[]>(() => {
-    // Load from localStorage or use default
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (error) {
-      console.error('Error loading faculty data from localStorage:', error);
-    }
-    return defaultFaculty;
-  });
+  const [faculty, setFaculty] = useState<Faculty[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Save to localStorage whenever faculty changes
+  // Load faculty data from API
+  const fetchFaculty = async () => {
+    try {
+      const response = await api.get<any[]>('/faculty'); // Use any[] for backend response
+      console.log('Faculty API response:', response.data);
+      
+      // Transform snake_case backend data to camelCase for frontend
+      const transformedFaculty = response.data.map(faculty => ({
+        id: faculty.id,
+        firstName: faculty.first_name || faculty.firstName,
+        lastName: faculty.last_name || faculty.lastName,
+        email: faculty.email,
+        phone: faculty.phone,
+        office: faculty.office,
+        department: faculty.department,
+        title: faculty.title,
+        status: faculty.status,
+        bio: faculty.bio,
+        specializations: faculty.specializations || [],
+        education: faculty.education || [],
+        awards: faculty.awards || [],
+        profileImage: faculty.profile_image || faculty.profileImage,
+        officeHours: faculty.office_hours || faculty.officeHours,
+        website: faculty.website,
+        researchInterests: faculty.research_interests || faculty.researchInterests,
+        yearsOfExperience: faculty.years_of_experience || faculty.yearsOfExperience,
+      }));
+      setFaculty(transformedFaculty);
+      return transformedFaculty;
+    } catch (error) {
+      console.error('Error fetching faculty data:', error);
+      // Fallback to default data if API fails
+      setFaculty(defaultFaculty);
+      return defaultFaculty;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
+    fetchFaculty();
+  }, []);
+
+  const addFaculty = async (newFaculty: Omit<Faculty, 'id'>) => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(faculty));
-    } catch (error) {
-      console.error('Error saving faculty data to localStorage:', error);
+      console.log('Sending faculty data to API:', newFaculty);
+      
+      // Transform camelCase to snake_case for backend
+      const backendFaculty = {
+        first_name: newFaculty.firstName,
+        last_name: newFaculty.lastName,
+        email: newFaculty.email,
+        phone: newFaculty.phone,
+        office: newFaculty.office,
+        department: newFaculty.department,
+        title: newFaculty.title,
+        status: newFaculty.status,
+        bio: newFaculty.bio,
+        specializations: newFaculty.specializations,
+        education: newFaculty.education,
+        awards: newFaculty.awards,
+        profile_image: newFaculty.profileImage,
+        office_hours: newFaculty.officeHours,
+        website: newFaculty.website,
+        research_interests: newFaculty.researchInterests,
+        years_of_experience: newFaculty.yearsOfExperience,
+      };
+
+      const response = await api.post<any>('/faculty', backendFaculty);
+      console.log('API response:', response.data);
+      
+      // Transform the response data from snake_case to camelCase
+      const transformedNewFaculty = {
+        id: response.data.id,
+        firstName: response.data.first_name || response.data.firstName,
+        lastName: response.data.last_name || response.data.lastName,
+        email: response.data.email,
+        phone: response.data.phone,
+        office: response.data.office,
+        department: response.data.department,
+        title: response.data.title,
+        status: response.data.status,
+        bio: response.data.bio,
+        specializations: response.data.specializations || [],
+        education: response.data.education || [],
+        awards: response.data.awards || [],
+        profileImage: response.data.profile_image || response.data.profileImage,
+        officeHours: response.data.office_hours || response.data.officeHours,
+        website: response.data.website,
+        researchInterests: response.data.research_interests || response.data.researchInterests,
+        yearsOfExperience: response.data.years_of_experience || response.data.yearsOfExperience,
+      };
+      
+      setFaculty(prev => [transformedNewFaculty, ...prev]);
+      return transformedNewFaculty;
+    } catch (error: any) {
+      console.error('Error adding faculty member:', error);
+      console.error('Error response:', error.response?.data);
+      
+      // Provide more specific error messages
+      if (error.response?.status === 401) {
+        throw new Error('Your session has expired. Please log in again.');
+      } else if (error.response?.status === 403) {
+        throw new Error('Only administrators can create faculty profiles. Please log in as an admin.');
+      } else if (error.response?.status === 422) {
+        const validationErrors = error.response.data.errors;
+        const errorMessages = Object.values(validationErrors).flat();
+        throw new Error(`Validation error: ${errorMessages.join(', ')}`);
+      } else {
+        throw error;
+      }
     }
-  }, [faculty]);
-
-  const addFaculty = (newFaculty: Faculty) => {
-    setFaculty(prev => [newFaculty, ...prev]);
   };
 
-  const updateFaculty = (id: string, updatedData: Partial<Faculty>) => {
-    setFaculty(prev => prev.map(f => f.id === id ? { ...f, ...updatedData } : f));
+  const updateFaculty = async (id: string, updatedData: Partial<Faculty>) => {
+    try {
+      // Remove authentication checks since we're using cookie-based auth
+      // The API will handle authentication through cookies
+
+      // Transform camelCase to snake_case for backend
+      const backendData: any = {};
+      
+      if (updatedData.firstName !== undefined) backendData.first_name = updatedData.firstName;
+      if (updatedData.lastName !== undefined) backendData.last_name = updatedData.lastName;
+      if (updatedData.email !== undefined) backendData.email = updatedData.email;
+      if (updatedData.phone !== undefined) backendData.phone = updatedData.phone;
+      if (updatedData.office !== undefined) backendData.office = updatedData.office;
+      if (updatedData.department !== undefined) backendData.department = updatedData.department;
+      if (updatedData.title !== undefined) backendData.title = updatedData.title;
+      if (updatedData.status !== undefined) backendData.status = updatedData.status;
+      if (updatedData.bio !== undefined) backendData.bio = updatedData.bio;
+      if (updatedData.specializations !== undefined) backendData.specializations = updatedData.specializations;
+      if (updatedData.education !== undefined) backendData.education = updatedData.education;
+      if (updatedData.awards !== undefined) backendData.awards = updatedData.awards;
+      if (updatedData.profileImage !== undefined) backendData.profile_image = updatedData.profileImage;
+      if (updatedData.officeHours !== undefined) backendData.office_hours = updatedData.officeHours;
+      if (updatedData.website !== undefined) backendData.website = updatedData.website;
+      if (updatedData.researchInterests !== undefined) backendData.research_interests = updatedData.researchInterests;
+      if (updatedData.yearsOfExperience !== undefined) backendData.years_of_experience = updatedData.yearsOfExperience;
+
+      let transformedUpdatedFaculty;
+      
+      try {
+        const response = await api.put<any>(`/faculty/${id}`, backendData); // Use any for backend response
+        
+        // Transform the response data from snake_case to camelCase
+        transformedUpdatedFaculty = {
+          id: response.data.id,
+          firstName: response.data.first_name || response.data.firstName,
+          lastName: response.data.last_name || response.data.lastName,
+          email: response.data.email,
+          phone: response.data.phone,
+          office: response.data.office,
+          department: response.data.department,
+          title: response.data.title,
+          status: response.data.status,
+          bio: response.data.bio,
+          specializations: response.data.specializations || [],
+          education: response.data.education || [],
+          awards: response.data.awards || [],
+          profileImage: response.data.profile_image || response.data.profileImage,
+          officeHours: response.data.office_hours || response.data.officeHours,
+          website: response.data.website,
+          researchInterests: response.data.research_interests || response.data.researchInterests,
+          yearsOfExperience: response.data.years_of_experience || response.data.yearsOfExperience,
+        };
+      } catch (apiError) {
+        // If API fails, update locally
+        console.warn('API unavailable, updating faculty locally:', apiError);
+        transformedUpdatedFaculty = {
+          ...updatedData,
+          id,
+          researchInterests: updatedData.researchInterests || [],
+          yearsOfExperience: updatedData.yearsOfExperience || 0,
+        } as Faculty;
+      }
+      
+      setFaculty(prev => {
+        const updatedFaculty = prev.map(f => f.id === id ? { ...f, ...transformedUpdatedFaculty } : f);
+        // Save to localStorage for persistence
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedFaculty));
+        return updatedFaculty;
+      });
+      
+      return transformedUpdatedFaculty;
+    } catch (error: any) {
+      console.error('Error updating faculty member:', error);
+      
+      // Provide more specific error messages
+      if (error.response?.status === 401) {
+        throw new Error('Your session has expired. Please log in again.');
+      } else if (error.response?.status === 403) {
+        throw new Error('You do not have permission to update this faculty profile.');
+      } else if (error.response?.status === 422) {
+        const validationErrors = error.response.data.errors;
+        const errorMessages = Object.values(validationErrors).flat();
+        throw new Error(`Validation error: ${errorMessages.join(', ')}`);
+      } else {
+        throw error;
+      }
+    }
   };
 
-  const deleteFaculty = (id: string) => {
-    setFaculty(prev => prev.filter(f => f.id !== id));
+  const deleteFaculty = async (id: string) => {
+    try {
+      await api.delete(`/faculty/${id}`);
+      setFaculty(prev => {
+        const updatedFaculty = prev.filter(f => f.id !== id);
+        // Save to localStorage for persistence
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedFaculty));
+        return updatedFaculty;
+      });
+    } catch (error) {
+      console.error('Error deleting faculty member:', error);
+      // Even if API fails, delete locally but don't throw error
+      setFaculty(prev => {
+        const updatedFaculty = prev.filter(f => f.id !== id);
+        // Save to localStorage for persistence
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedFaculty));
+        return updatedFaculty;
+      });
+      // Don't throw error - the deletion succeeded locally
+    }
   };
 
   const getFacultyById = (id: string) => {
     return faculty.find(f => f.id === id);
   };
 
+  const refreshFaculty = async () => {
+    await fetchFaculty();
+  };
+
   return (
-    <FacultyContext.Provider value={{ faculty, addFaculty, updateFaculty, deleteFaculty, getFacultyById }}>
+    <FacultyContext.Provider value={{ faculty, loading, addFaculty, updateFaculty, deleteFaculty, getFacultyById, refreshFaculty }}>
       {children}
     </FacultyContext.Provider>
   );
@@ -191,14 +356,14 @@ export function facultyToStudentView(faculty: Faculty) {
     name: `${faculty.firstName} ${faculty.lastName}`,
     position: faculty.title,
     department: faculty.department,
-    specialization: faculty.specializations,
-    education: faculty.education.join('; '),
+    specialization: faculty.specializations || [],
+    education: faculty.education ? faculty.education.join('; ') : '',
     email: faculty.email,
     phone: faculty.phone,
     officeLocation: faculty.office,
     profileImage: faculty.profileImage,
     bio: faculty.bio,
-    achievements: faculty.awards,
+    achievements: faculty.awards || [],
     researchInterests: faculty.researchInterests || [],
     yearsOfExperience: faculty.yearsOfExperience || 5,
     employmentStatus: faculty.status === 'Active' ? 'Regular' : faculty.status

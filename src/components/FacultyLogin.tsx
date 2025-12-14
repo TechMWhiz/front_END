@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Label } from "./ui/label";
 import { ArrowLeft, LogIn, User, Lock, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
+import { useFaculty } from "../context/FacultyContext";
 
 interface FacultyLoginProps {
   onLogin: (success: boolean) => void;
@@ -13,6 +14,7 @@ interface FacultyLoginProps {
 }
 
 export default function FacultyLogin({ onLogin, onBack }: FacultyLoginProps) {
+  const { faculty } = useFaculty();
   const [credentials, setCredentials] = useState({
     username: "",
     password: ""
@@ -25,12 +27,22 @@ export default function FacultyLogin({ onLogin, onBack }: FacultyLoginProps) {
 
     // Simulate API call
     setTimeout(() => {
-      // Demo credentials - in real app, this would be validated against backend
-      if (credentials.username === "faculty" && credentials.password === "faculty123") {
-        toast.success("Faculty login successful!");
+      console.log("Faculty data:", faculty);
+      console.log("Login attempt:", credentials);
+
+      // Check against faculty data - use email as username and require proper authentication
+      const facultyMember = faculty.find(f =>
+        f.email === credentials.username &&
+        credentials.password === f.lastName.toLowerCase() + "123" // Only allow faculty-specific passwords
+      );
+
+      console.log("Found faculty member:", facultyMember);
+
+      if (facultyMember) {
+        toast.success(`Welcome, ${facultyMember.firstName} ${facultyMember.lastName}!`);
         onLogin(true);
       } else {
-        toast.error("Invalid credentials. Try username: faculty, password: faculty123");
+        toast.error("Invalid credentials. Please check your email and password.");
         onLogin(false);
       }
       setIsLoading(false);
@@ -79,16 +91,17 @@ export default function FacultyLogin({ onLogin, onBack }: FacultyLoginProps) {
               <div className="space-y-2">
                 <Label htmlFor="username" className="flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  Faculty ID / Username
+                  Email / Username
                 </Label>
                 <Input
                   id="username"
-                  type="text"
-                  placeholder="Enter your faculty ID"
+                  type="email"
+                  placeholder=""
                   value={credentials.username}
                   onChange={(e) => handleInputChange("username", e.target.value)}
                   required
                   className="w-full"
+                  autoComplete="off"
                 />
               </div>
               
@@ -100,11 +113,12 @@ export default function FacultyLogin({ onLogin, onBack }: FacultyLoginProps) {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder=""
                   value={credentials.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
                   required
                   className="w-full"
+                  autoComplete="off"
                 />
               </div>
               
@@ -126,13 +140,7 @@ export default function FacultyLogin({ onLogin, onBack }: FacultyLoginProps) {
                 )}
               </Button>
             </form>
-            
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800 font-medium mb-2">Demo Credentials:</p>
-              <p className="text-xs text-blue-700">Username: faculty</p>
-              <p className="text-xs text-blue-700">Password: faculty123</p>
-            </div>
-            
+
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-600">
                 Forgot your password? Contact IT Support

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -47,16 +47,21 @@ const eventTypes = ["All", "Academic", "Cultural", "Career", "Community", "Sport
 const categories = ["All", "Conference", "Workshop", "Festival", "Fair", "Performance", "Service"];
 
 export default function EventsSection() {
-  const { events } = useEvents();
+  const { events, refreshEvents } = useEvents();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("All");
   const [filterCategory, setFilterCategory] = useState("All");
   const [expandedEvents, setExpandedEvents] = useState<string[]>([]);
 
-  // Convert to student view format and filter only Published and Public events
+  // Refresh events data when component mounts
+  useEffect(() => {
+    refreshEvents();
+  }, [refreshEvents]);
+
+  // Convert to student view format and filter only active and public events
   const studentViewEvents = useMemo(() => {
     return events
-      .filter(e => e.status === "Published" && e.isPublic)
+      .filter(e => e.status === "active" && e.is_public)
       .map(e => eventToStudentView(e));
   }, [events]);
 
@@ -103,7 +108,8 @@ export default function EventsSection() {
     });
   };
 
-  const formatTime = (timeString: string) => {
+  const formatTime = (timeString: string | undefined) => {
+    if (!timeString) return "Time not specified";
     const [hours, minutes] = timeString.split(':');
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -143,19 +149,19 @@ export default function EventsSection() {
       if (a.featured && !b.featured) return -1;
       if (!a.featured && b.featured) return 1;
       
-      const aUpcoming = isUpcoming(a.startDate);
-      const bUpcoming = isUpcoming(b.startDate);
+      const aUpcoming = a.startDate ? isUpcoming(a.startDate) : false;
+      const bUpcoming = b.startDate ? isUpcoming(b.startDate) : false;
       
       if (aUpcoming && !bUpcoming) return -1;
       if (!aUpcoming && bUpcoming) return 1;
       
-      return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+      return new Date(a.startDate || '').getTime() - new Date(b.startDate || '').getTime();
     });
   }, [studentViewEvents, searchTerm, filterType, filterCategory]);
 
   const featuredEvents = filteredEvents.filter(e => e.featured);
-  const upcomingEvents = filteredEvents.filter(e => !e.featured && isUpcoming(e.startDate));
-  const pastEvents = filteredEvents.filter(e => !e.featured && isPast(e.startDate));
+  const upcomingEvents = filteredEvents.filter(e => !e.featured && e.startDate && isUpcoming(e.startDate));
+  const pastEvents = filteredEvents.filter(e => !e.featured && e.startDate && isPast(e.startDate));
 
   return (
     <section id="events" className="py-16 bg-gradient-to-b from-green-50 to-white">

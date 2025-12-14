@@ -22,173 +22,153 @@ interface Program {
 
 const programs: Program[] = [
   {
-    title: "Bachelor of Science in Information Technology",
-    icon: Laptop,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Comprehensive IT program covering software development, network administration, and database management.",
-    fullDescription: "This program provides students with a strong foundation in information technology, including software development, network administration, database management, and cybersecurity. Students learn to design, develop, and maintain computer systems and applications.",
-    careers: ["Software Developer", "System Administrator", "IT Consultant", "Database Administrator", "Network Engineer", "Web Developer"],
-    color: "blue",
-    objectives: [
-      "Develop proficiency in programming languages and software development",
-      "Understand network architecture and administration",
-      "Master database design and management",
-      "Learn cybersecurity principles and practices"
-    ],
-    curriculum: ["Programming Fundamentals", "Data Structures and Algorithms", "Database Systems", "Network Security", "Web Development", "Software Engineering"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Mathematics Proficiency", "Basic Computer Knowledge"]
-  },
-  {
-    title: "Bachelor of Science in Business Administration",
-    icon: Briefcase,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Business education focusing on management, entrepreneurship, and organizational leadership.",
-    fullDescription: "A comprehensive business program that prepares students for careers in management, entrepreneurship, and organizational leadership. Students learn essential business skills including finance, marketing, operations, and strategic planning.",
-    careers: ["Business Manager", "Entrepreneur", "Operations Manager", "Marketing Manager", "Financial Analyst", "Human Resources Manager"],
-    color: "purple",
-    objectives: [
-      "Develop leadership and management skills",
-      "Understand business operations and strategy",
-      "Learn financial and marketing principles",
-      "Foster entrepreneurial thinking"
-    ],
-    curriculum: ["Principles of Management", "Marketing Management", "Financial Management", "Operations Management", "Business Ethics", "Strategic Planning"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Good Communication Skills"]
-  },
-  {
-    title: "Bachelor of Elementary Education",
-    icon: BookOpen,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Teacher education program preparing future elementary school educators.",
-    fullDescription: "This program prepares students to become effective elementary school teachers. It covers pedagogical theories, curriculum development, classroom management, and child psychology to equip future educators with the skills needed to inspire young learners.",
-    careers: ["Elementary Teacher", "Curriculum Developer", "Educational Coordinator", "School Administrator", "Educational Researcher"],
-    color: "green",
-    objectives: [
-      "Develop teaching methodologies and pedagogical skills",
-      "Understand child development and psychology",
-      "Learn curriculum design and assessment",
-      "Foster a love for learning in students"
-    ],
-    curriculum: ["Child Development", "Teaching Methods", "Educational Psychology", "Curriculum Design", "Classroom Management", "Teaching Practice"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Good Communication Skills", "Patience and Dedication"]
-  },
-  {
-    title: "Bachelor of Science in Agriculture",
-    icon: FlaskConical,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Agricultural science program focusing on crop production, soil management, and sustainable farming.",
-    fullDescription: "This program focuses on modern agricultural practices, sustainable farming, crop production, and agricultural economics. Students learn to apply scientific principles to improve agricultural productivity and sustainability.",
-    careers: ["Agricultural Technician", "Farm Manager", "Agricultural Inspector", "Agricultural Consultant", "Extension Officer", "Research Assistant"],
-    color: "orange",
-    objectives: [
-      "Understand agricultural systems and practices",
-      "Learn sustainable farming techniques",
-      "Master crop and soil management",
-      "Develop skills in agricultural research"
-    ],
-    curriculum: ["Crop Production", "Soil Science", "Agricultural Economics", "Plant Pathology", "Agricultural Extension", "Farm Management"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Interest in Agriculture", "Physical Fitness"]
-  },
-  {
-    title: "Bachelor of Science in Criminology",
-    icon: Scale,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Criminal justice program covering law enforcement, investigation, and public safety.",
-    fullDescription: "A comprehensive program that prepares students for careers in law enforcement, criminal investigation, and public safety. Students learn about criminal law, forensic science, crime investigation, and crime prevention strategies.",
-    careers: ["Police Officer", "Criminal Investigator", "Security Manager", "Forensic Analyst", "Corrections Officer", "Probation Officer"],
-    color: "teal",
-    objectives: [
-      "Understand criminal justice system",
-      "Learn investigation techniques",
-      "Master forensic science principles",
-      "Develop public safety skills"
-    ],
-    curriculum: ["Criminal Law", "Criminology", "Forensic Science", "Crime Investigation", "Crime Prevention", "Law Enforcement"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Physical and Mental Fitness", "Background Check"]
-  },
-  {
-    title: "Bachelor of Arts in English",
-    icon: BookOpen,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Literature and language program developing communication and analytical skills.",
-    fullDescription: "This program develops strong communication, critical thinking, and analytical skills through the study of literature, language, and writing. Students explore diverse literary works and learn to express themselves effectively in written and oral communication.",
-    careers: ["English Teacher", "Content Writer", "Communications Specialist", "Editor", "Journalist", "Public Relations Officer"],
-    color: "pink",
-    objectives: [
-      "Develop advanced writing and communication skills",
-      "Analyze literary works and texts",
-      "Understand language structure and usage",
-      "Foster critical thinking abilities"
-    ],
-    curriculum: ["English Literature", "Creative Writing", "Linguistics", "Literary Criticism", "Communication Studies", "Professional Writing"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Proficiency in English", "Good Writing Skills"]
-  }
-];
-
-// Additional programs for "View All Programs"
-const allPrograms: Program[] = [
-  ...programs,
-  {
-    title: "Bachelor of Secondary Education",
-    icon: GraduationCap,
-    duration: "4 years",
-    type: "Bachelor's",
-    description: "Prepare to teach in secondary schools with specialization in various subject areas.",
-    fullDescription: "This program prepares students to become secondary school teachers in various subject areas including Mathematics, Science, English, and Social Studies.",
-    careers: ["Secondary Teacher", "Subject Specialist", "Curriculum Developer", "Educational Researcher"],
-    color: "green",
-    objectives: [
-      "Develop expertise in chosen teaching specialization",
-      "Master secondary education pedagogy",
-      "Understand adolescent development",
-      "Learn effective classroom management for teenagers"
-    ],
-    curriculum: ["Teaching Methodology", "Subject Specialization", "Educational Technology", "Assessment and Evaluation"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Subject Area Proficiency"]
-  },
-  {
     title: "Bachelor of Science in Computer Science",
     icon: Laptop,
     duration: "4 years",
     type: "Bachelor's",
-    description: "Advanced computer science program focusing on algorithms, software engineering, and computer systems.",
-    fullDescription: "A rigorous program that covers advanced topics in computer science including algorithms, data structures, software engineering, artificial intelligence, and computer systems architecture.",
-    careers: ["Software Engineer", "Computer Scientist", "AI Specialist", "Systems Analyst", "Research Scientist"],
+    description: "A comprehensive program that delves into algorithms, software development, and computational theory to prepare students for careers in technology.",
+    fullDescription: "This program provides a deep understanding of computer science fundamentals, including programming, data structures, algorithms, and software engineering. Students explore advanced topics like artificial intelligence, machine learning, and cybersecurity, equipping them to innovate and solve complex problems in the digital world.",
+    careers: ["Software Engineer", "Data Scientist", "AI Researcher", "Systems Analyst", "Cybersecurity Analyst", "Tech Entrepreneur"],
     color: "blue",
     objectives: [
-      "Master algorithms and data structures",
-      "Develop software engineering expertise",
-      "Understand computer systems architecture",
-      "Explore artificial intelligence and machine learning"
+      "Master fundamental computer science concepts and algorithms",
+      "Develop skills in software design, development, and testing",
+      "Understand computational theory and computer systems",
+      "Foster analytical thinking and problem-solving abilities"
     ],
-    curriculum: ["Advanced Algorithms", "Software Engineering", "Computer Architecture", "Artificial Intelligence", "Machine Learning", "Operating Systems"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Strong Mathematics Background", "Programming Aptitude"]
+    curriculum: ["Data Structures and Algorithms", "Software Engineering", "Computer Architecture", "Artificial Intelligence", "Database Systems", "Operating Systems"],
+    admissionRequirements: ["High School Diploma", "Entrance Examination", "Strong Mathematics Background", "Basic Programming Knowledge"]
   },
   {
-    title: "Bachelor of Science in Civil Engineering",
-    icon: Building2,
-    duration: "5 years",
+    title: "Bachelor of Science in Information Technology",
+    icon: Laptop,
+    duration: "4 years",
     type: "Bachelor's",
-    description: "Engineering program focusing on infrastructure design, construction, and management.",
-    fullDescription: "This program prepares students to design, construct, and manage infrastructure projects including buildings, roads, bridges, and water systems.",
-    careers: ["Civil Engineer", "Structural Engineer", "Construction Manager", "Project Engineer", "Surveyor"],
+    description: "Focuses on information technology practices, including software development, network management, and cybersecurity.",
+    fullDescription: "This program covers essential IT skills such as programming, database management, network administration, and cybersecurity. Students learn to design, implement, and maintain IT systems, preparing them for diverse roles in the technology industry.",
+    careers: ["Software Developer", "IT Consultant", "Network Engineer", "Database Administrator", "Cybersecurity Specialist", "Systems Analyst"],
     color: "blue",
     objectives: [
-      "Design infrastructure projects",
-      "Understand construction materials and methods",
-      "Master structural analysis and design",
-      "Learn project management principles"
+      "Gain proficiency in programming and software development",
+      "Learn network and system administration",
+      "Master database design and management",
+      "Understand cybersecurity principles"
     ],
-    curriculum: ["Structural Analysis", "Construction Materials", "Transportation Engineering", "Hydraulics", "Geotechnical Engineering", "Project Management"],
-    admissionRequirements: ["High School Diploma", "Entrance Examination", "Strong Mathematics and Physics Background"]
+    curriculum: ["Programming Fundamentals", "Network Administration", "Database Systems", "Cybersecurity", "Web Development", "IT Project Management"],
+    admissionRequirements: ["High School Diploma", "Entrance Examination", "Mathematics Proficiency", "Basic Computer Skills"]
+  },
+  {
+    title: "Bachelor of Science in Information Systems",
+    icon: Laptop,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "Integrates information technology with business processes to manage and analyze data effectively.",
+    fullDescription: "This program combines IT knowledge with business acumen, teaching students to design information systems that support organizational goals. Topics include systems analysis, database management, project management, and enterprise software.",
+    careers: ["Systems Analyst", "IT Manager", "Business Analyst", "Project Manager", "Data Analyst", "Information Systems Consultant"],
+    color: "blue",
+    objectives: [
+      "Understand information systems design and implementation",
+      "Learn business process analysis",
+      "Develop skills in database and data management",
+      "Master project management in IT contexts"
+    ],
+    curriculum: ["Systems Analysis and Design", "Database Management", "Business Process Modeling", "Enterprise Systems", "IT Project Management", "Data Analytics"],
+    admissionRequirements: ["High School Diploma", "Entrance Examination", "Mathematics and Business Background", "Computer Literacy"]
+  },
+  {
+    title: "Bachelor of Science in Accountancy",
+    icon: Calculator,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "Prepares students for professional accounting careers with a focus on financial reporting, auditing, and taxation.",
+    fullDescription: "This program provides comprehensive training in accounting principles, financial analysis, auditing, and taxation. Students learn to prepare financial statements, conduct audits, and advise on financial matters, preparing them for CPA licensure and accounting roles.",
+    careers: ["Certified Public Accountant", "Financial Analyst", "Auditor", "Tax Consultant", "Accounting Manager", "Controller"],
+    color: "green",
+    objectives: [
+      "Master accounting principles and standards",
+      "Develop skills in financial reporting and analysis",
+      "Learn auditing and assurance techniques",
+      "Understand taxation and regulatory compliance"
+    ],
+    curriculum: ["Financial Accounting", "Managerial Accounting", "Auditing", "Taxation", "Financial Management", "Accounting Information Systems"],
+    admissionRequirements: ["High School Diploma", "Entrance Examination", "Strong Mathematics Background", "Good Analytical Skills"]
+  },
+  {
+    title: "Bachelor of Science in Accounting Information System",
+    icon: Calculator,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "Combines accounting knowledge with information technology for modern financial systems management.",
+    fullDescription: "This program integrates accounting with IT, teaching students to design and manage accounting information systems. Topics include financial software, data security, ERP systems, and IT auditing.",
+    careers: ["Accounting Systems Analyst", "IT Auditor", "Financial Systems Manager", "ERP Consultant", "Data Analyst", "Compliance Specialist"],
+    color: "green",
+    objectives: [
+      "Integrate accounting and IT knowledge",
+      "Design and implement accounting information systems",
+      "Ensure data security and compliance",
+      "Develop skills in financial software and ERP"
+    ],
+    curriculum: ["Accounting Principles", "Information Systems", "Database Design", "IT Auditing", "ERP Systems", "Financial Analytics"],
+    admissionRequirements: ["High School Diploma", "Entrance Examination", "Mathematics and Computer Background", "Analytical Skills"]
+  },
+  {
+    title: "Bachelor in Public Administration",
+    icon: Building2,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "Trains students in public administration, policy development, and government management.",
+    fullDescription: "This program focuses on public sector management, policy analysis, and administrative processes. Students learn about governance, public finance, and organizational behavior in government and non-profit settings.",
+    careers: ["Public Administrator", "Policy Analyst", "Government Manager", "NGO Director", "Program Coordinator", "Civil Servant"],
+    color: "teal",
+    objectives: [
+      "Understand public administration principles",
+      "Learn policy development and analysis",
+      "Develop management skills for public organizations",
+      "Foster ethical decision-making in governance"
+    ],
+    curriculum: ["Public Administration", "Policy Analysis", "Public Finance", "Organizational Behavior", "Governance and Ethics", "Public Management"],
+    admissionRequirements: ["High School Diploma", "Entrance Examination", "Good Communication Skills", "Interest in Public Service"]
+  },
+  {
+    title: "Bachelor of Science in Entrepreneurship",
+    icon: Briefcase,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "Develops entrepreneurial skills and business acumen for starting and managing ventures.",
+    fullDescription: "This program equips students with the knowledge and skills to start and manage their own businesses. Topics include business planning, marketing, finance, and innovation, preparing students for entrepreneurial careers.",
+    careers: ["Entrepreneur", "Business Owner", "Startup Founder", "Business Consultant", "Product Manager", "Marketing Manager"],
+    color: "purple",
+    objectives: [
+      "Develop entrepreneurial mindset and skills",
+      "Learn business planning and strategy",
+      "Understand financial management for startups",
+      "Foster innovation and creativity"
+    ],
+    curriculum: ["Entrepreneurship Fundamentals", "Business Planning", "Marketing Management", "Financial Management", "Innovation and Design", "Operations Management"],
+    admissionRequirements: ["High School Diploma", "Entrance Examination", "Creative Thinking", "Basic Business Knowledge"]
+  },
+  {
+    title: "Bachelor of Technical Vocational Teacher Education major in Computer System Servicing",
+    icon: Laptop,
+    duration: "4 years",
+    type: "Bachelor's",
+    description: "Prepares students to teach technical vocational courses in computer system servicing and maintenance.",
+    fullDescription: "This program trains future teachers in technical vocational education, specializing in computer system servicing. Students learn teaching methodologies, computer hardware/software, and maintenance techniques to educate vocational students.",
+    careers: ["Vocational Teacher", "Computer Technician", "IT Trainer", "Technical Instructor", "Lab Coordinator", "Maintenance Specialist"],
+    color: "blue",
+    objectives: [
+      "Master teaching methods for technical education",
+      "Develop expertise in computer system servicing",
+      "Learn curriculum development for vocational courses",
+      "Foster practical skills in hardware and software maintenance"
+    ],
+    curriculum: ["Teaching Methodology", "Computer Hardware", "Software Installation", "Network Servicing", "Maintenance Techniques", "Vocational Education Principles"],
+    admissionRequirements: ["High School Diploma", "Entrance Examination", "Technical Aptitude", "Teaching Interest"]
   }
 ];
+
+// Additional programs for "View All Programs"
+const allPrograms: Program[] = [...programs];
 
 const colorVariants: Record<string, string> = {
   blue: "bg-blue-100 text-blue-600",

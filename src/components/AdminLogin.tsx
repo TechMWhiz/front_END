@@ -97,12 +97,13 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
                   <Input
                     id="username"
                     type="text"
-                    placeholder="Enter your username"
+                    placeholder=""
                     value={formData.username}
                     onChange={(e) => handleInputChange("username", e.target.value)}
                     className="pl-10"
                     required
                     disabled={isLoading}
+                    autoComplete="off"
                   />
                 </div>
               </div>
@@ -114,7 +115,7 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder=""
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     className="pl-10 pr-10"
@@ -153,17 +154,6 @@ export default function AdminLogin({ onLogin, onBack }: AdminLoginProps) {
                 )}
               </Button>
             </form>
-
-            {/* Demo Credentials Info */}
-            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm text-muted-foreground text-center mb-2">
-                Demo Credentials:
-              </p>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p><strong>Username:</strong> admin</p>
-                <p><strong>Password:</strong> sorsu2024</p>
-              </div>
-            </div>
 
             <div className="mt-6 text-center">
               <p className="text-xs text-muted-foreground">

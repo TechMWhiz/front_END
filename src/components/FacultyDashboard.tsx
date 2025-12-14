@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -7,17 +7,18 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Edit, 
-  Save, 
-  Camera, 
+import {
+  User,
+  Mail,
+  Phone,
+  Edit,
+  Save,
+  Camera,
   GraduationCap,
   Building
 } from "lucide-react";
 import { toast } from "sonner";
+import { useFaculty } from "../context/FacultyContext";
 
 interface FacultyProfile {
   id: string;
@@ -35,32 +36,114 @@ interface FacultyProfile {
   website?: string;
 }
 
-export default function FacultyDashboard() {
+interface FacultyDashboardProps {
+  userData?: any;
+}
+
+export default function FacultyDashboard({ userData }: FacultyDashboardProps) {
+  const { faculty, updateFaculty, refreshFaculty } = useFaculty();
   const [isEditing, setIsEditing] = useState(false);
-  
-  const [profile, setProfile] = useState<FacultyProfile>({
-    id: "FAC001",
-    firstName: "Juan",
-    lastName: "Dela Cruz",
-    email: "j.delacruz@sorsu-bulan.edu.ph",
-    phone: "+63 917 123 4567",
-    department: "Computer Science",
-    title: "Associate Professor",
-    bio: "Dr. Juan Dela Cruz is an Associate Professor in the Computer Science Department with over 10 years of teaching experience. He specializes in Data Structures, Algorithms, and Machine Learning.",
-    office: "CS Building, Room 201",
-    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    specializations: ["Data Structures", "Algorithms", "Machine Learning", "Database Systems"],
-    officeHours: "Mon/Wed 2-4 PM",
-    website: ""
+
+  // Find current faculty member from context or use userData
+  const currentFaculty = faculty.find(f => 
+    f.email === userData?.email || 
+    f.id === userData?.id ||
+    `${f.firstName} ${f.lastName}` === userData?.name
+  );
+
+  // Initialize profile from current faculty data or userData
+  const [profile, setProfile] = useState<FacultyProfile>(() => {
+    const source = currentFaculty || userData;
+    if (source) {
+      return {
+        id: source.id || "FAC001",
+        firstName: source.firstName || source.name?.split(' ')[0] || "Unknown",
+        lastName: source.lastName || source.name?.split(' ')[1] || "User",
+        email: source.email || "",
+        phone: source.phone || "",
+        department: source.department || "",
+        title: source.title || source.position || "",
+        bio: source.bio || `Welcome to ${source.firstName || source.name?.split(' ')[0] || "Faculty"}'s profile.`,
+        office: source.office || source.officeLocation || "",
+        photo: source.profileImage || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        specializations: source.specializations || source.researchInterests || [],
+        officeHours: source.officeHours || "",
+        website: source.website || ""
+      };
+    }
+    return {
+      id: "FAC001",
+      firstName: "Unknown",
+      lastName: "User",
+      email: "",
+      phone: "",
+      department: "",
+      title: "",
+      bio: "",
+      office: "",
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      specializations: [],
+      officeHours: "",
+      website: ""
+    };
   });
+
+  // Allow all faculty to edit their profiles (remove restriction to only Kenneth and Sean)
+  const canEdit = true;
 
   const [newSpecialization, setNewSpecialization] = useState("");
 
-  const handleProfileUpdate = () => {
+  // Update profile state when faculty context data changes
+  useEffect(() => {
+    if (currentFaculty) {
+      setProfile({
+        id: currentFaculty.id,
+        firstName: currentFaculty.firstName,
+        lastName: currentFaculty.lastName,
+        email: currentFaculty.email,
+        phone: currentFaculty.phone,
+        department: currentFaculty.department,
+        title: currentFaculty.title,
+        bio: currentFaculty.bio,
+        office: currentFaculty.office,
+        photo: currentFaculty.profileImage || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        specializations: currentFaculty.specializations || [],
+        officeHours: currentFaculty.officeHours,
+        website: currentFaculty.website
+      });
+    }
+  }, [currentFaculty]);
+
+  const handleProfileUpdate = async () => {
     if (isEditing) {
-      // Save the profile
-      toast.success("Profile updated successfully!");
-      setIsEditing(false);
+      try {
+        // Save the profile to the faculty context and database
+        const updatedData = {
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          email: profile.email,
+          phone: profile.phone,
+          department: profile.department,
+          title: profile.title,
+          bio: profile.bio,
+          office: profile.office,
+          specializations: profile.specializations,
+          officeHours: profile.officeHours,
+          website: profile.website,
+          profileImage: profile.photo
+        };
+
+        await updateFaculty(profile.id, updatedData);
+        
+        // Refresh faculty data to ensure we have the latest
+        await refreshFaculty();
+        
+        toast.success("Profile updated successfully!");
+        setIsEditing(false);
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        toast.error("Failed to update profile. Please try again.");
+      }
     } else {
       setIsEditing(true);
     }
@@ -133,7 +216,7 @@ export default function FacultyDashboard() {
                       {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  {isEditing && (
+                  {isEditing && canEdit && (
                     <Button variant="outline" size="sm" className="flex items-center gap-2">
                       <Camera className="w-4 h-4" />
                       Change Photo

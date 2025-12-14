@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -24,10 +24,10 @@ import { toast } from "sonner";
 import { useEvents, type Event } from "../context/EventContext";
 
 const categories = ["Academic", "Career", "Social", "Cultural", "Sports", "Professional Development", "Student Life"];
-const statuses = ["Draft", "Published", "Cancelled", "Completed"];
+const statuses = ["active", "inactive", "cancelled"];
 
 export default function EventsManager() {
-  const { events, addEvent, updateEvent, deleteEvent, updateEventStatus } = useEvents();
+  const { events, addEvent, updateEvent, deleteEvent, updateEventStatus, refreshEvents } = useEvents();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -51,59 +51,79 @@ export default function EventsManager() {
     isPublic: true
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Refresh events data when component mounts
+  useEffect(() => {
+    refreshEvents();
+  }, [refreshEvents]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (editingEvent) {
-      // Update existing event
-      const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
-      updateEvent(editingEvent.id, {
-        ...formData,
-        maxAttendees: parseInt(formData.maxAttendees),
-        status: editingEvent.status || "Published",
-        date: formData.date,
-        time: formData.time,
-        startDate: formData.date,
-        startTime: formData.time,
-        endDate: formData.endDate || undefined,
-        endTime: formData.endTime || undefined,
-        type: formData.category,
-        featured: formData.featured !== undefined ? formData.featured : (editingEvent.featured || false),
-        tags: tagsArray.length > 0 ? tagsArray : (editingEvent.tags || []),
-        registrationDeadline: formData.registrationDeadline || undefined,
-        contactEmail: formData.contactEmail || undefined,
-        website: formData.website || undefined,
-        capacity: parseInt(formData.maxAttendees)
-      });
-      toast.success("Event updated successfully!");
-    } else {
-      // Create new event
-      const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
-      const newEvent: Event = {
-        id: Date.now().toString(),
-        ...formData,
-        maxAttendees: parseInt(formData.maxAttendees),
-        currentAttendees: 0,
-        status: "Published",
-        date: formData.date,
-        time: formData.time,
-        startDate: formData.date,
-        startTime: formData.time,
-        endDate: formData.endDate || undefined,
-        endTime: formData.endTime || undefined,
-        type: formData.category,
-        featured: formData.featured || false,
-        tags: tagsArray,
-        registrationDeadline: formData.registrationDeadline || undefined,
-        contactEmail: formData.contactEmail || undefined,
-        website: formData.website || undefined,
-        capacity: parseInt(formData.maxAttendees)
-      };
-      addEvent(newEvent);
-      toast.success("Event created successfully!");
+    try {
+      if (editingEvent) {
+        // Update existing event
+        const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
+        const updatedEvent = {
+          title: formData.title,
+          description: formData.description,
+          start_date: formData.date,
+          end_date: formData.endDate || undefined,
+          location: formData.location,
+          organizer: formData.organizer,
+          type: formData.category,
+          category: formData.category,
+          max_attendees: parseInt(formData.maxAttendees),
+          is_public: formData.isPublic,
+          registration_required: formData.registrationRequired,
+          registration_deadline: formData.registrationDeadline || undefined,
+          tags: tagsArray,
+          status: editingEvent.status // Add the status field to the updated event
+        };
+        await updateEvent(editingEvent.id, updatedEvent);
+        toast.success("Event updated successfully!");
+      } else {
+        // Create new event
+        const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
+        const newEvent = {
+          title: formData.title,
+          description: formData.description,
+          start_date: formData.date,
+          end_date: formData.endDate || undefined,
+          location: formData.location,
+          organizer: formData.organizer,
+          type: formData.category,
+          category: formData.category,
+          max_attendees: parseInt(formData.maxAttendees),
+          is_public: formData.isPublic,
+          registration_required: formData.registrationRequired,
+          registration_deadline: formData.registrationDeadline || undefined,
+          tags: tagsArray,
+          status: "active"
+        };
+        console.log('Creating new event:', newEvent);
+        await addEvent(newEvent);
+        toast.success("Event created successfully!");
+      }
+      
+      resetForm();
+    } catch (error) {
+      console.error("Full error object:", error);
+      
+      // Type guard for error handling
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as any;
+        console.error("Error response data:", axiosError.response?.data);
+        console.error("Error status:", axiosError.response?.status);
+        console.error("Error headers:", axiosError.response?.headers);
+        toast.error(`Failed to save event: ${axiosError.response?.data?.message || 'Unknown error'}`);
+      } else if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        toast.error(`Failed to save event: ${error.message}`);
+      } else {
+        console.error("Unknown error type:", error);
+        toast.error("Failed to save event: Unknown error occurred");
+      }
     }
-    
-    resetForm();
   };
 
   const resetForm = () => {
@@ -131,33 +151,39 @@ export default function EventsManager() {
   };
 
   const handleEdit = (event: Event) => {
+    console.log('Editing event:', event);
     setEditingEvent(event);
     setFormData({
       title: event.title,
       description: event.description,
-      date: event.date || event.startDate || "",
+      date: event.start_date || event.date || event.startDate || "",
       time: event.time || event.startTime || "",
-      endDate: event.endDate || "",
+      endDate: event.end_date || event.endDate || "",
       endTime: event.endTime || "",
       location: event.location,
       category: event.category,
-      maxAttendees: event.maxAttendees.toString(),
+      maxAttendees: (event.max_attendees || event.maxAttendees || 0).toString(),
       organizer: event.organizer,
-      registrationRequired: event.registrationRequired,
-      registrationDeadline: event.registrationDeadline || "",
+      registrationRequired: event.registration_required || event.registrationRequired || false,
+      registrationDeadline: event.registration_deadline || event.registrationDeadline || "",
       contactEmail: event.contactEmail || "",
       website: event.website || "",
       tags: event.tags ? event.tags.join(', ') : "",
       featured: event.featured || false,
-      isPublic: event.isPublic
+      isPublic: event.is_public || event.isPublic || true
     });
     setIsCreateDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteEvent(id);
-    setDeleteConfirmId(null);
-    toast.success("Event deleted successfully!");
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteEvent(id);
+      setDeleteConfirmId(null);
+      toast.success("Event deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast.error("Failed to delete event. Please try again.");
+    }
   };
 
   const handleStatusChange = (id: string, newStatus: string) => {
@@ -167,14 +193,12 @@ export default function EventsManager() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Published":
+      case "active":
         return "bg-green-100 text-green-800";
-      case "Draft":
+      case "inactive":
         return "bg-gray-100 text-gray-800";
-      case "Cancelled":
+      case "cancelled":
         return "bg-red-100 text-red-800";
-      case "Completed":
-        return "bg-blue-100 text-blue-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -407,99 +431,105 @@ export default function EventsManager() {
       </div>
 
       <div className="space-y-4">
-        {events.map((event) => (
-          <Card key={event.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CardTitle className="text-lg">{event.title}</CardTitle>
-                    <Badge className={getStatusColor(event.status)}>
-                      {event.status}
+        {events && events.length > 0 ? (
+          events.map((event) => (
+            <Card key={event.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CardTitle className="text-lg">{event.title || 'Untitled Event'}</CardTitle>
+                      <Badge className={getStatusColor(event.status || 'active')}>
+                        {event.status || 'active'}
+                      </Badge>
+                      <Badge variant="outline">{event.category || 'Uncategorized'}</Badge>
+                      {!(event.is_public || event.isPublic) && (
+                        <Badge variant="secondary">Private</Badge>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{event.start_date || event.date || event.startDate ? new Date(event.start_date || event.date || event.startDate!).toLocaleDateString() : 'Date not set'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span>{event.time || event.startTime || "All day"}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        <span>{event.location || 'Location not set'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        <span>{event.organizer || 'Organizer not set'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Select onValueChange={(value) => handleStatusChange(event.id, value)}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Change Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statuses.map(status => (
+                          <SelectItem key={status} value={status}>{status}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button size="sm" variant="outline" onClick={() => handleEdit(event)}>
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <AlertDialog open={deleteConfirmId === event.id} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+                      <AlertDialogTrigger asChild>
+                        <Button size="sm" variant="outline" onClick={() => setDeleteConfirmId(event.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Event</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete "{event.title}"? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(event.id)} className="bg-red-600 hover:bg-red-700">
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">{event.description || 'No description available'}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Badge className={getAttendanceStatus(event.current_attendees || event.currentAttendees || 0, event.max_attendees || event.maxAttendees || 0)}>
+                      {event.current_attendees || event.currentAttendees || 0}/{event.max_attendees || event.maxAttendees || 0} attendees
                     </Badge>
-                    <Badge variant="outline">{event.category}</Badge>
-                    {!event.isPublic && (
-                      <Badge variant="secondary">Private</Badge>
+                    {(event.registration_required || event.registrationRequired) && (
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        Registration Required
+                      </Badge>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>{new Date(event.date).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>{event.time}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4" />
-                      <span>{event.location}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      <span>{event.organizer}</span>
-                    </div>
+                  <div className="text-sm text-muted-foreground">
+                    {Math.round(((event.current_attendees || event.currentAttendees || 0) / (event.max_attendees || event.maxAttendees || 1)) * 100)}% capacity
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Select onValueChange={(value) => handleStatusChange(event.id, value)}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Change Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statuses.map(status => (
-                        <SelectItem key={status} value={status}>{status}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button size="sm" variant="outline" onClick={() => handleEdit(event)}>
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <AlertDialog open={deleteConfirmId === event.id} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-                    <AlertDialogTrigger asChild>
-                      <Button size="sm" variant="outline" onClick={() => setDeleteConfirmId(event.id)}>
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Event</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete "{event.title}"? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(event.id)} className="bg-red-600 hover:bg-red-700">
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">{event.description}</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Badge className={getAttendanceStatus(event.currentAttendees, event.maxAttendees)}>
-                    {event.currentAttendees}/{event.maxAttendees} attendees
-                  </Badge>
-                  {event.registrationRequired && (
-                    <Badge variant="outline" className="flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" />
-                      Registration Required
-                    </Badge>
-                  )}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {Math.round((event.currentAttendees / event.maxAttendees) * 100)}% capacity
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No events found. Create your first event to get started.</p>
+          </div>
+        )}
       </div>
     </div>
   );

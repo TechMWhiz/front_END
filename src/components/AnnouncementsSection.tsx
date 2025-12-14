@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -37,17 +37,38 @@ const categories = ["All", "Academic", "Event", "General", "Administrative", "Se
 const priorities = ["All", "High", "Medium", "Low"];
 
 export default function AnnouncementsSection() {
-  const { announcements, incrementViews } = useAnnouncements();
+  const { announcements, incrementViews, refreshAnnouncements } = useAnnouncements();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
   const [filterPriority, setFilterPriority] = useState("All");
   const [expandedAnnouncements, setExpandedAnnouncements] = useState<string[]>([]);
 
-  // Convert to student view format and filter only Published announcements
+  // Refresh announcements data when component mounts
+  useEffect(() => {
+    refreshAnnouncements();
+  }, [refreshAnnouncements]);
+
+  // Convert to student view format and filter only active announcements
   const studentViewAnnouncements = useMemo(() => {
     return announcements
-      .filter(a => a.status === "Published")
-      .map(a => announcementToStudentView(a))
+      .filter(a => {
+        // Check if announcement has a valid status (Published, active, or no status set)
+        const status = a.status?.toLowerCase();
+        return !status || status === 'published' || status === 'active';
+      })
+      .map(a => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        type: a.type || a.category || "General",
+        priority: a.priority,
+        targetAudience: a.target_audience || a.audience || "All",
+        publishDate: a.publish_date || a.publishDate || a.created_at,
+        expiryDate: a.expiry_date || a.expiryDate,
+        author: a.author || "Admin",
+        isPinned: a.is_pinned || a.isPinned || false,
+        tags: a.tags || []
+      }))
       .filter(a => {
         // Filter out expired announcements
         if (a.expiryDate) {

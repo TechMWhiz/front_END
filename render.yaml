@@ -1,0 +1,54 @@
+services:
+  # Laravel Backend API
+  - type: web
+    name: sorsu-api
+    env: php
+    plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+    startCommand: 'php artisan serve --host=0.0.0.0 --port=$PORT'
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://sorsu-api.onrender.com
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: ${sorsu-db}
+      - key: DB_PORT
+        value: 3306
+      - key: DB_DATABASE
+        value: ${sorsu-db}
+      - key: DB_USERNAME
+        value: ${sorsu-db}
+      - key: DB_PASSWORD
+        value: ${sorsu-db}
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+
+  # React Frontend
+  - type: web
+    name: sorsu-frontend
+    env: static
+    plan: free
+    buildCommand: npm ci && npm run build
+    publishDir: build
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://sorsu-api.onrender.com/api
+
+databases:
+  # MySQL Database
+  - name: sorsu-db
+    plan: free
+    databaseType: mysql

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import axios from 'axios';
 
 export interface CalendarItem {
   id: string;
@@ -106,16 +107,31 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     }
   }, [calendarItems]);
 
-  const addCalendarItem = (newItem: CalendarItem) => {
-    setCalendarItems(prev => [newItem, ...prev]);
+  const addCalendarItem = async (newItem: CalendarItem) => {
+    try {
+      const response = await axios.post<CalendarItem>('http://localhost:8000/api/calendar', newItem);
+      setCalendarItems(prev => [response.data, ...prev]);
+    } catch (error) {
+      console.error('Error adding calendar item:', error);
+    }
   };
 
-  const updateCalendarItem = (id: string, updatedData: Partial<CalendarItem>) => {
-    setCalendarItems(prev => prev.map(item => item.id === id ? { ...item, ...updatedData } : item));
+  const updateCalendarItem = async (id: string, updatedData: Partial<CalendarItem>) => {
+    try {
+      const response = await axios.put<CalendarItem>(`http://localhost:8000/api/calendar/${id}`, updatedData);
+      setCalendarItems(prev => prev.map(item => item.id === id ? response.data : item));
+    } catch (error) {
+      console.error('Error updating calendar item:', error);
+    }
   };
 
-  const deleteCalendarItem = (id: string) => {
-    setCalendarItems(prev => prev.filter(item => item.id !== id));
+  const deleteCalendarItem = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/calendar/${id}`);
+      setCalendarItems(prev => prev.filter(item => item.id !== id));
+    } catch (error) {
+      console.error('Error deleting calendar item:', error);
+    }
   };
 
   const getCalendarItemById = (id: string) => {
