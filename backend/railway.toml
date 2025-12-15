@@ -1,9 +1,8 @@
 [build]
-builder = "nixpacks"
-buildCommand = "sh -c 'composer install --no-dev --optimize-autoloader'"
+builder = "dockerfile"
 
 [deploy]
-startCommand = "sh -c 'php artisan serve --host=0.0.0.0 --port=${PORT:-8000}'"
+startCommand = "apache2-foreground"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
@@ -14,4 +13,3 @@ APP_KEY = "base64:C+j03P67AlkEX9kZRJoXa1TKpWVrkI/hvfF03dzqVdM="
 CACHE_DRIVER = "file"
 SESSION_DRIVER = "file"
 QUEUE_CONNECTION = "sync"
-NIXPACKS_PHP_VERSION = "8.3"
