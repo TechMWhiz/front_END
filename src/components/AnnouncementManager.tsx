@@ -88,8 +88,6 @@ export default function AnnouncementManager() {
         toast.success("Announcement created successfully!");
       }
       
-      // Refresh announcements data to show changes
-      await refreshAnnouncements();
       resetForm();
     } catch (error) {
       console.error('Error saving announcement:', error);
@@ -132,8 +130,6 @@ export default function AnnouncementManager() {
       await deleteAnnouncement(id);
       setDeleteConfirmId(null);
       toast.success("Announcement deleted successfully!");
-      // Refresh announcements data to show changes
-      await refreshAnnouncements();
     } catch (error) {
       console.error('Error deleting announcement:', error);
       toast.error("Failed to delete announcement. Please try again.");

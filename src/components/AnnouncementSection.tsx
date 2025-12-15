@@ -18,6 +18,17 @@ export default function AnnouncementSection() {
   const { announcements, incrementViews } = useAnnouncements();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  // Listen for announcement updates
+  useEffect(() => {
+    const handleAnnouncementUpdate = () => {
+      // Force re-render when announcements are updated
+      setExpandedId(null);
+    };
+    
+    window.addEventListener('announcementsUpdated', handleAnnouncementUpdate);
+    return () => window.removeEventListener('announcementsUpdated', handleAnnouncementUpdate);
+  }, []);
+
   // Sort announcements: pinned first, then by created_at date
   const sortedAnnouncements = [...announcements].sort((a, b) => {
     // Pinned announcements come first

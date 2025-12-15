@@ -9,10 +9,7 @@ services:
       php artisan config:cache
       php artisan route:cache
       php artisan view:cache
-<<<<<<< HEAD
       php artisan migrate --force
-=======
->>>>>>> 6fc5c7518667b463b6047318a9ae78e18581a141
     startCommand: 'php artisan serve --host=0.0.0.0 --port=$PORT'
     envVars:
       - key: APP_ENV

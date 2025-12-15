@@ -32,6 +32,7 @@ interface FacultyContextType {
   deleteFaculty: (id: string) => Promise<void>;
   getFacultyById: (id: string) => Faculty | undefined;
   refreshFaculty: () => Promise<void>;
+  setFaculty: React.Dispatch<React.SetStateAction<Faculty[]>>;
 }
 
 const FacultyContext = createContext<FacultyContextType | undefined>(undefined);
@@ -105,7 +106,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
   const fetchFaculty = async () => {
     try {
       const response = await api.get<any[]>('/faculty'); // Use any[] for backend response
-      console.log('Faculty API response:', response.data);
       
       // Transform snake_case backend data to camelCase for frontend
       const transformedFaculty = response.data.map(faculty => ({
@@ -131,7 +131,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
       setFaculty(transformedFaculty);
       return transformedFaculty;
     } catch (error) {
-      console.error('Error fetching faculty data:', error);
       // Fallback to default data if API fails
       setFaculty(defaultFaculty);
       return defaultFaculty;
@@ -146,8 +145,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
 
   const addFaculty = async (newFaculty: Omit<Faculty, 'id'>) => {
     try {
-      console.log('Sending faculty data to API:', newFaculty);
-      
       // Transform camelCase to snake_case for backend
       const backendFaculty = {
         first_name: newFaculty.firstName,
@@ -170,7 +167,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
       };
 
       const response = await api.post<any>('/faculty', backendFaculty);
-      console.log('API response:', response.data);
       
       // Transform the response data from snake_case to camelCase
       const transformedNewFaculty = {
@@ -197,9 +193,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
       setFaculty(prev => [transformedNewFaculty, ...prev]);
       return transformedNewFaculty;
     } catch (error: any) {
-      console.error('Error adding faculty member:', error);
-      console.error('Error response:', error.response?.data);
-      
       // Provide more specific error messages
       if (error.response?.status === 401) {
         throw new Error('Your session has expired. Please log in again.');
@@ -217,9 +210,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
 
   const updateFaculty = async (id: string, updatedData: Partial<Faculty>) => {
     try {
-      // Remove authentication checks since we're using cookie-based auth
-      // The API will handle authentication through cookies
-
       // Transform camelCase to snake_case for backend
       const backendData: any = {};
       
@@ -269,7 +259,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
         };
       } catch (apiError) {
         // If API fails, update locally
-        console.warn('API unavailable, updating faculty locally:', apiError);
         transformedUpdatedFaculty = {
           ...updatedData,
           id,
@@ -287,8 +276,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
       
       return transformedUpdatedFaculty;
     } catch (error: any) {
-      console.error('Error updating faculty member:', error);
-      
       // Provide more specific error messages
       if (error.response?.status === 401) {
         throw new Error('Your session has expired. Please log in again.');
@@ -314,7 +301,6 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
         return updatedFaculty;
       });
     } catch (error) {
-      console.error('Error deleting faculty member:', error);
       // Even if API fails, delete locally but don't throw error
       setFaculty(prev => {
         const updatedFaculty = prev.filter(f => f.id !== id);
@@ -335,7 +321,7 @@ export function FacultyProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <FacultyContext.Provider value={{ faculty, loading, addFaculty, updateFaculty, deleteFaculty, getFacultyById, refreshFaculty }}>
+    <FacultyContext.Provider value={{ faculty, loading, addFaculty, updateFaculty, deleteFaculty, getFacultyById, refreshFaculty, setFaculty }}>
       {children}
     </FacultyContext.Provider>
   );

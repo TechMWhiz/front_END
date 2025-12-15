@@ -13,12 +13,9 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    console.log('API Request:', config);
-    // Remove Bearer token and use cookie-based authentication
-    // const token = localStorage.getItem('auth_token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // Always log API requests for debugging
+    console.log('API Request:', config.method?.toUpperCase(), config.url);
+    console.log('Request headers:', config.headers);
     return config;
   },
   (error) => {
@@ -30,11 +27,14 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    console.log('API Response:', response);
+    // Log successful responses
+    console.log('API Response:', response.status, response.config.url);
+    console.log('Response data:', response.data);
     return response;
   },
   (error) => {
     console.error('Response interceptor error:', error);
+    console.error('Error response:', error.response?.data);
     if (error.response?.status === 401) {
       // Only handle 401 for non-login requests and avoid redirect loops
       if (!error.config?.url?.includes('/login') && !error.config?.url?.includes('/faculty') && !error.config?.url?.includes('/events') && !error.config?.url?.includes('/announcements')) {

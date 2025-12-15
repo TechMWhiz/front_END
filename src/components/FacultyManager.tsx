@@ -38,7 +38,7 @@ const titles = [
 const statuses = ["Active", "On Leave", "Sabbatical", "Retired", "Inactive"];
 
 export default function FacultyManager() {
-  const { faculty, loading, addFaculty, updateFaculty, deleteFaculty, refreshFaculty } = useFaculty();
+  const { faculty, loading, addFaculty, updateFaculty, deleteFaculty, refreshFaculty, setFaculty } = useFaculty();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -78,33 +78,56 @@ export default function FacultyManager() {
 
     try {
       if (editingFaculty) {
-        // Update existing faculty - only pass the fields that changed
-        const updateData: Partial<Faculty> = {
-          firstName: facultyData.firstName,
-          lastName: facultyData.lastName,
-          email: facultyData.email,
-          phone: facultyData.phone,
-          office: facultyData.office,
-          department: facultyData.department,
-          title: facultyData.title,
-          status: facultyData.status,
-          bio: facultyData.bio,
-          specializations: facultyData.specializations,
-          education: facultyData.education,
-          awards: facultyData.awards,
-          officeHours: facultyData.officeHours,
-          website: facultyData.website
-        };
-        await updateFaculty(editingFaculty.id, updateData);
-        toast.success("Faculty profile updated successfully!");
+        // Optimistic update - update UI immediately
+        const optimisticData = { ...editingFaculty, ...facultyData };
+        setFaculty(prev => prev.map(f => f.id === editingFaculty.id ? optimisticData : f));
+        
+        try {
+          const updateData: Partial<Faculty> = {
+            firstName: facultyData.firstName,
+            lastName: facultyData.lastName,
+            email: facultyData.email,
+            phone: facultyData.phone,
+            office: facultyData.office,
+            department: facultyData.department,
+            title: facultyData.title,
+            status: facultyData.status,
+            bio: facultyData.bio,
+            specializations: facultyData.specializations,
+            education: facultyData.education,
+            awards: facultyData.awards,
+            officeHours: facultyData.officeHours,
+            website: facultyData.website
+          };
+          await updateFaculty(editingFaculty.id, updateData);
+          toast.success("Faculty profile updated successfully!");
+        } catch (error) {
+          // Revert optimistic update on error
+          await refreshFaculty();
+          throw error;
+        }
       } else {
-        // Create new faculty
-        await addFaculty(facultyData);
-        toast.success("Faculty profile created successfully!");
+        // Optimistic update - add to UI immediately
+        const tempId = `temp-${Date.now()}`;
+        const optimisticFaculty: Faculty = {
+          ...facultyData,
+          id: tempId,
+          researchInterests: [],
+          yearsOfExperience: 0
+        };
+        setFaculty(prev => [optimisticFaculty, ...prev]);
+        
+        try {
+          const result = await addFaculty(facultyData);
+          // Replace temp entry with real data
+          setFaculty(prev => prev.map(f => f.id === tempId ? result : f));
+          toast.success("Faculty profile created successfully!");
+        } catch (error) {
+          // Remove optimistic entry on error
+          setFaculty(prev => prev.filter(f => f.id !== tempId));
+          throw error;
+        }
       }
-      
-      // Refresh faculty data to show changes
-      await refreshFaculty();
       
       setIsCreateDialogOpen(false);
       resetForm();
@@ -157,13 +180,19 @@ export default function FacultyManager() {
   };
 
   const handleDelete = async (id: string) => {
+    const originalFaculty = faculty.find(f => f.id === id);
+    if (!originalFaculty) return;
+    
+    // Optimistic delete - remove from UI immediately
+    setFaculty(prev => prev.filter(f => f.id !== id));
+    setDeleteConfirmId(null);
+    
     try {
       await deleteFaculty(id);
-      setDeleteConfirmId(null);
       toast.success("Faculty profile deleted successfully!");
-      // Don't immediately refresh - let the local state update handle UI
-      // The FacultyContext already handles local state update
     } catch (error) {
+      // Revert optimistic delete on error
+      setFaculty(prev => [...prev, originalFaculty]);
       console.error('Error deleting faculty:', error);
       toast.error("Failed to delete faculty profile. Please try again.");
     }

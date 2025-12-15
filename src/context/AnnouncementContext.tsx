@@ -127,41 +127,53 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetchAnnouncements();
   }, []);
+  
   const fetchAnnouncements = async () => {
     try {
       const response = await api.get<any[]>('/announcements');
-      console.log('Announcements API response:', response.data);
+      console.log('Raw API response:', response.data);
+      
+      if (!response.data || response.data.length === 0) {
+        console.log('No announcements data received from API, using defaults');
+        setAnnouncements(defaultAnnouncements);
+        setLoading(false);
+        return;
+      }
       
       // Transform snake_case backend data to camelCase for frontend
-      const transformedAnnouncements = response.data.map(announcement => ({
-        id: announcement.id,
-        title: announcement.title,
-        content: announcement.content,
-        type: announcement.type,
-        priority: announcement.priority,
-        target_audience: announcement.target_audience,
-        publish_date: announcement.publish_date,
-        expiry_date: announcement.expiry_date,
-        is_pinned: announcement.is_pinned,
-        views: announcement.views,
-        status: announcement.status,
-        created_by: announcement.created_by,
-        created_at: announcement.created_at,
-        updated_at: announcement.updated_at,
-        // Frontend compatibility fields
-        category: announcement.type,
-        audience: announcement.target_audience,
-        publishDate: announcement.publish_date,
-        expiryDate: announcement.expiry_date,
-        targetAudience: announcement.target_audience,
-        isPinned: announcement.is_pinned,
-        author: "Admin", // Default author for now
-        tags: []
-      }));
+      const transformedAnnouncements = response.data.map(announcement => {
+        console.log('Processing announcement:', announcement);
+        return {
+          id: announcement.id,
+          title: announcement.title,
+          content: announcement.content,
+          type: announcement.type,
+          priority: announcement.priority,
+          target_audience: announcement.target_audience,
+          publish_date: announcement.publish_date,
+          expiry_date: announcement.expiry_date,
+          is_pinned: announcement.is_pinned,
+          views: announcement.views,
+          status: announcement.status || 'Published', // Default to Published if missing
+          created_by: announcement.created_by,
+          created_at: announcement.created_at,
+          updated_at: announcement.updated_at,
+          // Frontend compatibility fields
+          category: announcement.type,
+          audience: announcement.target_audience,
+          publishDate: announcement.publish_date,
+          expiryDate: announcement.expiry_date,
+          targetAudience: announcement.target_audience,
+          isPinned: announcement.is_pinned,
+          author: "Admin", // Default author for now
+          tags: []
+        };
+      });
       
+      console.log('Final transformed announcements:', transformedAnnouncements);
       setAnnouncements(transformedAnnouncements);
     } catch (error) {
-      console.error('Error fetching announcements data:', error);
+      console.error('Error fetching announcements:', error);
       // Fallback to default data if API fails
       setAnnouncements(defaultAnnouncements);
     } finally {
@@ -171,7 +183,25 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
 
   const addAnnouncement = async (newAnnouncement: Omit<Announcement, 'id'>) => {
     try {
-      console.log('Sending announcement data to API:', newAnnouncement);
+      // Optimistic update - add to UI immediately
+      const tempId = `temp-${Date.now()}`;
+      const optimisticAnnouncement: Announcement = {
+        ...newAnnouncement,
+        id: tempId,
+        views: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        // Frontend compatibility fields
+        category: newAnnouncement.type,
+        audience: newAnnouncement.target_audience,
+        publishDate: newAnnouncement.publish_date,
+        expiryDate: newAnnouncement.expiry_date,
+        targetAudience: newAnnouncement.target_audience,
+        isPinned: newAnnouncement.is_pinned,
+        author: "Admin",
+        tags: []
+      };
+      setAnnouncements(prev => [optimisticAnnouncement, ...prev]);
       
       // Transform camelCase to snake_case for backend
       const backendAnnouncement = {
@@ -186,7 +216,6 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
       };
 
       const response = await api.post<any>('/announcements', backendAnnouncement);
-      console.log('API response:', response.data);
       
       // Transform the response data from snake_case to camelCase
       const transformedNewAnnouncement = {
@@ -215,11 +244,18 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
         tags: []
       };
       
-      setAnnouncements(prev => [transformedNewAnnouncement, ...prev]);
+      // Replace temp entry with real data
+      setAnnouncements(prev => prev.map(a => a.id === tempId ? transformedNewAnnouncement : a));
+      
+      // Trigger global event to notify all components
+      window.dispatchEvent(new CustomEvent('announcementsUpdated', { 
+        detail: { announcements: announcements.map(a => a.id === tempId ? transformedNewAnnouncement : a) } 
+      }));
+      
       return transformedNewAnnouncement;
     } catch (error: any) {
-      console.error('Error adding announcement:', error);
-      console.error('Error response:', error.response?.data);
+      // Remove optimistic entry on error and refresh
+      await refreshAnnouncements();
       
       // Provide more specific error messages
       if (error.response?.status === 401) {
@@ -238,8 +274,6 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
 
   const updateAnnouncement = async (id: string, updatedData: Partial<Announcement>) => {
     try {
-      console.log('Updating announcement:', id, updatedData);
-      
       // Transform camelCase to snake_case for backend
       const backendData: any = {};
       if (updatedData.title) backendData.title = updatedData.title;
@@ -253,7 +287,6 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
       if (updatedData.status) backendData.status = updatedData.status;
 
       const response = await api.put<any>(`/announcements/${id}`, backendData);
-      console.log('Update API response:', response.data);
       
       // Transform response data from snake_case to camelCase
       const transformedAnnouncement = {
@@ -283,22 +316,28 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
       };
       
       setAnnouncements(prev => prev.map(a => a.id === id ? transformedAnnouncement : a));
+      
+      // Trigger global event to notify all components
+      window.dispatchEvent(new CustomEvent('announcementsUpdated', { 
+        detail: { announcements: announcements.map(a => a.id === id ? transformedAnnouncement : a) } 
+      }));
+      
       return transformedAnnouncement;
     } catch (error: any) {
-      console.error('Error updating announcement:', error);
-      console.error('Error response:', error.response?.data);
       throw error;
     }
   };
 
   const deleteAnnouncement = async (id: string) => {
     try {
-      console.log('Deleting announcement:', id);
       await api.delete(`/announcements/${id}`);
       setAnnouncements(prev => prev.filter(a => a.id !== id));
+      
+      // Trigger global event to notify all components
+      window.dispatchEvent(new CustomEvent('announcementsUpdated', { 
+        detail: { announcements: announcements.filter(a => a.id !== id) } 
+      }));
     } catch (error: any) {
-      console.error('Error deleting announcement:', error);
-      console.error('Error response:', error.response?.data);
       throw error;
     }
   };
@@ -316,7 +355,6 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
   const refreshAnnouncements = async () => {
     try {
       const response = await api.get<any[]>('/announcements');
-      console.log('Refresh announcements API response:', response.data);
       
       // Transform snake_case backend data to camelCase for frontend
       const transformedAnnouncements = response.data.map(announcement => ({
@@ -330,7 +368,7 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
         expiry_date: announcement.expiry_date,
         is_pinned: announcement.is_pinned,
         views: announcement.views,
-        status: announcement.status,
+        status: announcement.status || 'Published',
         created_by: announcement.created_by,
         created_at: announcement.created_at,
         updated_at: announcement.updated_at,
@@ -341,15 +379,20 @@ export function AnnouncementProvider({ children }: { children: ReactNode }) {
         expiryDate: announcement.expiry_date,
         targetAudience: announcement.target_audience,
         isPinned: announcement.is_pinned,
-        author: "Admin", // Default author for now
+        author: "Admin",
         tags: []
       }));
       
-      setAnnouncements(transformedAnnouncements);
+      // Force update by creating a new array reference
+      setAnnouncements([...transformedAnnouncements]);
+      
+      // Also trigger a global event to notify all components
+      window.dispatchEvent(new CustomEvent('announcementsUpdated', { 
+        detail: { announcements: transformedAnnouncements } 
+      }));
+      
     } catch (error) {
-      console.error('Error refreshing announcements data:', error);
-      // Fallback to default data if API fails
-      setAnnouncements(defaultAnnouncements);
+      // Don't fallback to default data on refresh error, keep existing data
     }
   };
 

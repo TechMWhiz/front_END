@@ -43,18 +43,47 @@ export default function AnnouncementsSection() {
   const [filterPriority, setFilterPriority] = useState("All");
   const [expandedAnnouncements, setExpandedAnnouncements] = useState<string[]>([]);
 
-  // Refresh announcements data when component mounts
+  // Refresh announcements data when component mounts and periodically
   useEffect(() => {
     refreshAnnouncements();
+    
+    // Set up periodic refresh to ensure data is up-to-date
+    const interval = setInterval(() => {
+      refreshAnnouncements();
+    }, 30000); // Refresh every 30 seconds
+    
+    // Listen for custom announcement updates
+    const handleAnnouncementUpdate = () => {
+      refreshAnnouncements();
+    };
+    
+    window.addEventListener('announcementsUpdated', handleAnnouncementUpdate);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('announcementsUpdated', handleAnnouncementUpdate);
+    };
   }, [refreshAnnouncements]);
 
   // Convert to student view format and filter only active announcements
   const studentViewAnnouncements = useMemo(() => {
-    return announcements
+    // If no announcements, return empty array
+    if (!announcements || announcements.length === 0) {
+      return [];
+    }
+    
+    const filtered = announcements
       .filter(a => {
-        // Check if announcement has a valid status (Published, active, or no status set)
+        // More permissive status checking - include announcements with common status values
         const status = a.status?.toLowerCase();
-        return !status || status === 'published' || status === 'active';
+        const isValidStatus = !status || 
+                              status === 'published' || 
+                              status === 'active' || 
+                              status === 'draft' ||
+                              status === 'pending' ||
+                              status === 'new' ||
+                              status === 'scheduled';
+        return isValidStatus;
       })
       .map(a => ({
         id: a.id,
@@ -70,12 +99,24 @@ export default function AnnouncementsSection() {
         tags: a.tags || []
       }))
       .filter(a => {
+        // Temporarily disable expiry filtering to test
+        console.log(`Announcement "${a.title}" expiry: ${a.expiryDate}`);
+        return true; // Show all announcements for now
+        
         // Filter out expired announcements
         if (a.expiryDate) {
-          return new Date(a.expiryDate) >= new Date();
+          const expiryDate = new Date(a.expiryDate as string);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Set to start of day for proper comparison
+          expiryDate.setHours(0, 0, 0, 0); // Set to start of day for proper comparison
+          const isExpired = expiryDate < today;
+          console.log(`Announcement "${a.title}" expiry: ${a.expiryDate}, today: ${today.toISOString()}, expired=${isExpired}`);
+          return !isExpired;
         }
         return true;
       });
+    
+    return filtered;
   }, [announcements]);
 
   const getPriorityColor = (priority: string) => {
