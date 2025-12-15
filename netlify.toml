@@ -7,7 +7,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://your-railway-app-url.railway.app/api/:splat"
+  to = "https://sorsuu-29d22600.up.railway.app/api/:splat"
   status = 200
   force = true
 
