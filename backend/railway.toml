@@ -1,23 +1,17 @@
 [build]
 builder = "nixpacks"
-buildCommand = "sh -c 'composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache && php artisan view:cache'"
+buildCommand = "sh -c 'composer install --no-dev --optimize-autoloader'"
 
 [deploy]
-startCommand = "sh -c 'php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}'"
+startCommand = "sh -c 'php artisan serve --host=0.0.0.0 --port=${PORT:-8000}'"
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
+restartPolicyMaxRetries = 3
 
 [env]
 APP_ENV = "production"
-APP_DEBUG = "false"
+APP_DEBUG = "true"
 APP_KEY = "base64:C+j03P67AlkEX9kZRJoXa1TKpWVrkI/hvfF03dzqVdM="
 CACHE_DRIVER = "file"
 SESSION_DRIVER = "file"
 QUEUE_CONNECTION = "sync"
 NIXPACKS_PHP_VERSION = "8.3"
-DB_CONNECTION = "mysql"
-DB_HOST = "${RAILWAY_PRIVATE_SERVICE_HOSTNAME}"
-DB_PORT = "3306"
-DB_DATABASE = "${RAILWAY_DATABASE_NAME}"
-DB_USERNAME = "${RAILWAY_DATABASE_USERNAME}"
-DB_PASSWORD = "${RAILWAY_DATABASE_PASSWORD}"
