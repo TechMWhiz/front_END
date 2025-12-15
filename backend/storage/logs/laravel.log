@@ -13732,6 +13732,7 @@
 #63 {main}
 "} 
 [2025-12-14 13:47:41] laravel.INFO: Login successful {"user_id":2,"email":"kenneth.gisalan@sorsu.edu","role":"faculty"} 
+<<<<<<< HEAD
 [2025-12-14 13:54:01] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at C:\\Users\\arvie\\sorsu\\backend\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php:212)
 [stacktrace]
 #0 C:\\Users\\arvie\\sorsu\\backend\\vendor\\laravel\\framework\\src\\Illuminate\\Log\\LogManager.php(137): Illuminate\\Log\\LogManager->resolve()
@@ -21227,3 +21228,5 @@
 #67 C:\\Users\\arvie\\sorsu\\backend\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(16): require_once('...')
 #68 {main}
 "} 
+=======
+>>>>>>> 6fc5c7518667b463b6047318a9ae78e18581a141
