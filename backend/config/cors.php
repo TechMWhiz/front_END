@@ -25,7 +25,7 @@ return [
 
     'allowed_headers' => ['*'],
     
-    'allowed_request_origins' => ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001'],
+    'allowed_request_origins' => ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'http://127.0.0.1:3001', 'https://shiny-fairy-caf764.netlify.app'],
 
     'exposed_headers' => ['*'],
 
