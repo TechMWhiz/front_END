@@ -2,7 +2,7 @@
 builder = "dockerfile"
 
 [deploy]
-startCommand = "apache2-foreground"
+startCommand = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
@@ -13,3 +13,10 @@ APP_KEY = "base64:C+j03P67AlkEX9kZRJoXa1TKpWVrkI/hvfF03dzqVdM="
 CACHE_DRIVER = "file"
 SESSION_DRIVER = "file"
 QUEUE_CONNECTION = "sync"
+DB_CONNECTION = "mysql"
+DB_HOST = "interchange.proxy.rlwy.net"
+DB_PORT = "39893"
+DB_DATABASE = "railway"
+DB_USERNAME = "root"
+DB_PASSWORD = "LtcCAGnOauofFWoGooegfHelDYxydyJR"
+DATABASE_URL = "mysql://${{ MySQL.MYSQL_USER }}:${{ MySQL.MYSQL_PASSWORD }}@${{ MySQL.MYSQL_HOST }}:${{ MySQL.MYSQL_PORT }}/${{ MySQL.MYSQL_DATABASE }}"
