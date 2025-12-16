@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import UniversityHeader from "./components/UniversityHeader";
 import HeroSection from "./components/HeroSection";
 import ProgramsSection from "./components/ProgramsSection";
